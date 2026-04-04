@@ -18,8 +18,13 @@ Fixed
 
 ## [1.0.0] - 04-03-2026
 
-Setup the repository and the datatable for sql
+Defined the project concetp and MVP scope
 
 ## Added
 
-- nba_player_insight table
+- Set up the Spring Boot backend project
+- Created the PostgreSQL database
+- Designed and created the first schema tables:
+  - teams
+  - players
+  - player_season_stats
