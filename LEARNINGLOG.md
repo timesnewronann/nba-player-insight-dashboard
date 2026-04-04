@@ -1,5 +1,27 @@
 # Learning Log
 
+## Command Cheat Sheet
+
+# activate venv
+
+source .venv/bin/activate
+
+# install deps
+
+pip install -r requirements.txt
+
+# run Spring Boot app
+
+./mvnw spring-boot:run
+
+# connect to Postgres
+
+psql -U postgres -d nba_player_insight
+
+# inside psql, list tables
+
+\dt
+
 ### April 2nd 2026
 
 - Setup the repo

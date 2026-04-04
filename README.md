@@ -4,6 +4,23 @@ HoopIQ is a full-stack NBA player analytics dashboard built to explore player da
 
 **GOAL**: build a real-world software engineering portfolio piece that demonstrates backend development, relational database design, data ingestion, API development, and frontend integration.
 
+## Run What We Have So Far
+
+This project currently has:
+
+- a Spring Boot backend scaffold
+- a PostgreSQL database created locally
+- SQL tables for `teams`, `players`, and `player_season_stats`
+- a Python environment for ETL / ingestion work
+
+### 1. Activate the Python virtual environment
+
+#### macOS / Linux
+
+```bash
+source .venv/bin/activate
+```
+
 ## Why I Built This
 
 I wanted to create a project that connects my love of the game with the kinds of technical skills used in software engineering.
