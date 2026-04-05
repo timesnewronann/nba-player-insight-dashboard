@@ -357,3 +357,196 @@ HoopIQ:
 - database schema created
 - ETL Pipeline for teams and players
 - real NBA data loaded into PostgreSQL
+
+## GOAL: Feature/springboot-player-api
+
+Make Spring Boot connect to PostgreSQL and expose the first endpoint.
+`GET /api/players`
+
+Step 1
+
+Configure Spring Boot database connection
+
+Step 2
+
+Create a Player entity
+
+Step 3
+
+Create a PlayerRepository
+
+Step 4
+
+Create a PlayerService or go directly to controller if we want to stay simple first
+
+Step 5
+
+Create PlayerController
+
+Step 6
+
+Test GET /api/players
+
+## What is Pom.xml doing?
+
+pom.xml is Maven's project instruction sheet
+
+It tells Maven:
+
+- what this project is called
+- what Java version to use
+- what libraries to download
+- how to build and run the app
+
+Kind of like the project's dependency contract
+
+# Application.properties Job
+
+- tell Spring Boot how to connect to your PostgreSQL database and how to behave with JPA/Hibernate
+
+We want Spring Boot to:
+
+1. Start successfully
+2. Connect to your existing nba_player_insight database
+3. Not try to recreate your tables
+4. Print useful SQL logs while you learn
+
+What each line is doing
+`spring.application.name=hoopiq-api`
+Purpose
+
+This names your Spring Boot application.
+
+Why it matters
+
+It helps with logs and general app identity.
+
+It is not the most important config line, but it is good project metadata.
+
+Database connection section
+`spring.datasource.url=jdbc:postgresql://localhost:5432/nba_player_insight`
+Purpose
+
+This tells Spring where your database lives.
+
+Break it down
+
+- jdbc:postgresql:// → Java’s Postgres connection format
+- localhost → the DB is running on your machine
+- 5432 → the Postgres port
+- nba_player_insight → the database name
+  Why this matters
+
+Without this line, Spring would not know what database to connect to.
+
+`spring.datasource.username=timesnewronan`
+Purpose
+
+This tells Spring which PostgreSQL role/user to log in as.
+
+Why it matters
+
+This must match the role you discovered actually works on your machine.
+
+We learned earlier that postgres was wrong for your setup.
+
+`spring.datasource.password=YOUR_PASSWORD_HERE`
+Purpose
+
+This gives Spring the password for that PostgreSQL role.
+
+Why it matters
+
+If your Postgres role requires password auth, this must be correct.
+
+Important note
+
+For now this is fine for local testing, but later we should move this into environment variables instead of hardcoding it.
+
+`spring.datasource.driver-class-name=org.postgresql.Driver`
+Purpose
+
+This tells Spring which database driver class to use.
+
+Why it matters
+
+It makes the Postgres driver explicit.
+
+Spring can often infer this, but I like being explicit while you are learning.
+
+JPA / Hibernate section
+`spring.jpa.hibernate.ddl-auto=none`
+Purpose
+
+This tells Hibernate:
+
+do not create, update, or drop my schema automatically
+
+Why this is very important
+
+You already created the tables yourself in PostgreSQL.
+
+So we want Spring Boot to use the schema, not try to manage it.
+
+Why this is the safest choice
+
+If we used something like:
+
+- update
+- create
+- create-drop
+
+Hibernate could try to change your database structure.
+
+That is not what we want right now.
+
+`spring.jpa.show-sql=true`
+Purpose
+
+This tells Spring/Hibernate to print SQL queries in the console.
+
+Why it helps
+
+This is great for learning.
+
+When you hit an endpoint later, you will be able to see what SQL the backend is generating.
+
+That helps connect:
+
+- controller call
+- repository logic
+- actual SQL query
+- spring.jpa.properties.hibernate.format_sql=true
+  Purpose
+
+This makes the printed SQL more readable.
+
+Why it helps
+
+Without this, SQL logs can look squished and harder to follow.
+
+This is mainly a developer-experience setting.
+
+## First Backend Feature
+
+GOAL:
+
+- Create the first endpoint:
+  `GET /api/players`
+  Spring Boot should:
+
+1. Query the players table
+2. Turn rows into Java objects
+3. Return them as JSON
+
+### Mental Model
+
+1. Entity
+   A java class that maps to the players table
+   "one java object = one row from the table"
+2. Repostiory
+   A Spring Interface that reads from the database
+   "This is the the tool that fetches player rows for us"
+3. Controller
+   The HTTP Layer
+   "this is what exposes /api/players to the browser or curl"

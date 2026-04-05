@@ -1,0 +1,88 @@
+package com.timesnewronan.hoopiq_api.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+// Create a player class
+@Entity
+@Table(name = "players")
+public class Player {
+    // add fields that match the table columns
+    @Id
+    private Long id;
+
+    @Column(name = "nba_player_id", nullable = false, unique = true)
+    private Integer nbaPlayerId;
+
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
+
+    @Column(name = "team_id")
+    private Long teamId;
+
+    @Column(name = "position")
+    private String position;
+
+    @Column(name = "height")
+    private String height;
+
+    @Column(name = "weight")
+    private String weight;
+
+    @Column(name = "active")
+    private Boolean active;
+
+    // Map it to the players table
+
+    // Mark the primary key
+    public Player() {
+
+    }
+
+    // Generate getters and setters
+    public Long getId() {
+        return id;
+    }
+
+    public Integer getNbaPlayerId() {
+        return nbaPlayerId;
+    }
+
+    public void setNbaPlayerId(Integer nbaPlayerId) {
+        this.nbaPlayerId = nbaPlayerId;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public string getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    
+}
