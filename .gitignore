@@ -1,0 +1,85 @@
+# ------------------------------
+# Environment variables / secrets
+# ------------------------------
+.env
+.env.*
+!.env.example
+
+# ------------------------------
+# Python
+# ------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.python-version
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python tooling / test / cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ------------------------------
+# OS / editor files
+# ------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ------------------------------
+# Logs
+# ------------------------------
+*.log
+
+# ------------------------------
+# Local database / temp exports
+# ------------------------------
+*.sqlite3
+*.db
+data/raw/
+data/intermediate/
+data/processed/
+
+# Keep folder structure if needed
+!data/raw/.gitkeep
+!data/intermediate/.gitkeep
+!data/processed/.gitkeep
+
+# ------------------------------
+# Java / Spring Boot
+# ------------------------------
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven wrapper logs
+.maven/
+
+# ------------------------------
+# Node / frontend
+# ------------------------------
+node_modules/
+dist/
+build/
+coverage/
+
+# ------------------------------
+# Misc
+# ------------------------------
+*.tmp
+*.swp
