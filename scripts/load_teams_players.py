@@ -55,7 +55,7 @@ for team in team_rows:
             conference,
             division
         )
-        VALUES (% s, % s, % s, % s, % s, % s)
+        VALUES (%s, %s, %s, %s, %s, %s)
         ON CONFLICT(nba_team_id)
         DO UDPATE SET
             team_name = EXCLUDED.team_name,
@@ -84,11 +84,45 @@ player_rows = players.get_players()
 # Loop through each player and insert them into the players table
 for player in player_rows:
     cursor.execute(
-
+        """
+        INSERT INTO players (
+            nba_player_id,
+            first_name,
+            last_name,
+            full_name,
+            team_id,
+            position,
+            height,
+            weight,
+            active
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (nba_player_id)
+        DO UPDATE SET
+            first_name = EXCLUDED.first_name,
+            last_name = EXCLUDED.last_name,
+            full_name = EXCLUDED.full_name,
+            active = EXCLUDED.active
+        """,
+        (
+            player["id"],
+            player["first_name"],
+            player["last_name"],
+            player["full_name"],
+            None,  # We are not filling team_id yet
+            None,  # We are not filling position yet
+            None,  # We are not filling heigh yet
+            None,  # We are not filling weight yet
+            player["is_active"],
+        ),
     )
 
-# Make the changes to the database persistent
+# Make the changes to the database permanent
 connection.commit()
+
+# Print a small success summary so we know what happened
+print(f"Loaded or updated {len(team_rows)} teams.")
+print(f"Loaded or updated {len(player_rows)} players.")
 
 # Close cursor and communication with the database
 cursor.close()
