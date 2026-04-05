@@ -236,3 +236,124 @@ A failed command leaves the transaction aborted and you usually need rollback be
 - that makes it the safest place for cleanup code
 - so even if an error happens, we still close the cursor and connection.
   Guranteed cleanup
+
+## Try
+
+- try to run this risky code
+  Database work and API work can fial:
+- wrong password
+- DB not running
+- SQL typo
+- network issue
+- bad schema mismatch
+
+Exceptions:
+
+- catches an error if anything inside try fails
+- we hae a chance to roll back
+- print a helpful message
+- re-raise the error
+
+Connection.rollback():
+
+- Cancels the unfinished transaction on this connection
+
+Why this matters?
+If something failed halfway through, rollback resets the transaction instead of leaving it in a broken state.
+
+1. Start PostgreSQL
+   `brew services start postgresql@15`
+2. Make sure the database exists
+   `psql postgres`
+   List databases
+   `\l`
+3. Make sure the tables exist
+   Connect to your project database
+   `\c nba_player_insight`
+   List tables
+   `\dt`
+   Exit psql
+   `\q`
+4. Activate virtual environment
+   `source venv/bin/activate`
+5. Install requirements if needed
+   `pip install -r scripts/requirements.txt`
+6. Run the ETL script
+   `python scripts/load_teams_players.py`
+7. Verify the data in psql
+
+# Get database users
+
+(venv) (base) timesnewronan@Ronans-MacBook-Air-5 scripts % psql postgres
+psql (15.17 (Homebrew))
+Type "help" for help.
+
+postgres=# \du
+List of roles
+Role name | Attributes | Member of
+---------------+------------------------------------------------------------+-----------
+timesnewronan | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
+
+postgres=#
+
+## Difference between schema problems and data-shape problems
+
+### Schema Problem:
+
+- Wrong column name in SQL
+- table does not exist
+- column does not exist
+- not null violation
+- foreign key violation
+
+### Data-shape problem
+
+- keyError
+- missing dictionary field
+- wrong JSON shape
+- wrong field name from API response
+
+ETL Script successfully:
+
+- loaded the .env file
+- connected to PostgreSQL
+- inserted or updated 30 teams
+- inserted or updated 5103 players
+
+## How to connect to project database
+
+`\c nba_player_insight`
+
+## How to verify tables
+
+`\dt`
+
+## How to count the rows
+
+SELECT COUNT(_) FROM teams;
+SELECT COUNT(_) FROM players;
+
+## How to preview sample rows
+
+- visually confirms the data looks normal
+
+SELECT _ FROM teams LIMIT 5;
+SELECT _ FROM players LIMIT 5;
+
+What problem did we solve ?
+"How do we get external NBA data into our own relational database in a rerunnable way"
+
+How did we solve it?
+We used:
+
+- environment variables for DB config
+- Python to fetch and transform data
+- SQL upsert logic to avoid duplicates
+- transactions with commit() / rollback()
+- try / except / finally for safer execution
+
+HoopIQ:
+
+- database schema created
+- ETL Pipeline for teams and players
+- real NBA data loaded into PostgreSQL

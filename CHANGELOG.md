@@ -20,9 +20,20 @@ Fixed
 
 Implemented an ETL script which reads configuration, connects to the nba_insight database, pulls external data from the nba_api, inserts the data into our schema, and can be rerun safely.
 
-Added
+## Added
 
-- load_teams_players.py
+- initial Python ETL script to load NBA teams and players into PostgreSQL
+- environment variable support for local databse configuration
+- upsert logic for rerunnable team and player ingestion
+
+## Changed
+
+- updated project README with current setup and ETL workflows notes
+
+## Fixed
+
+- resolved local PostgreSQL role and environment variables loading issues
+- handled missing team fields from `nba_api` by storing nullable values
 
 ## [1.0.0] - 04-03-2026
 
