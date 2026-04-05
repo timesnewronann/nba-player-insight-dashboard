@@ -16,9 +16,17 @@ Added
 
 Fixed
 
+## [1.0.1] - 04-05-2026
+
+Implemented an ETL script which reads configuration, connects to the nba_insight database, pulls external data from the nba_api, inserts the data into our schema, and can be rerun safely.
+
+Added
+
+- load_teams_players.py
+
 ## [1.0.0] - 04-03-2026
 
-Defined the project concetp and MVP scope
+Defined the project concept and MVP scope
 
 ## Added
 

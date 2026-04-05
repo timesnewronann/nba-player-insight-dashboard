@@ -212,3 +212,27 @@ Question 4
 
 Why is commit() needed?
 Commit is needed to make the changes to the datbase permanent
+
+## April 5th 2026
+
+1. If the script crashes halfway through loading players, what problem could happen without a rollback()?
+   If the script crashes halfway through loading players the cursor inserts may not be written properly and our database is corrupted.
+
+Better Answer:
+
+- the transaction can be left in a failed state
+- some earlier statements in that transaction may not be safely finalized
+- the connection may refuse more commands until you roll back
+- you can end uo unsure what actually got persisted versus what did not
+
+A failed command leaves the transaction aborted and you usually need rollback before issuing more commands on that connection.
+
+"The current transaciton is broken, and we need rollback() to reset it safely"
+
+2. Why is finally a good place to close cursor and connection?
+   It's good as a last measure to make sure we don't leave our cursor and connection open which may make our database open and unsafe?
+
+- finally runs whether the try block succeeds or fails
+- that makes it the safest place for cleanup code
+- so even if an error happens, we still close the cursor and connection.
+  Guranteed cleanup
