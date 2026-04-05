@@ -1,4 +1,5 @@
 from os import getenv
+from pathlib import Path
 
 # Load variables from the .env file
 from dotenv import load_dotenv
@@ -11,7 +12,8 @@ import psycopg2
 
 
 # Load values from .env so we can read DB credentials safely
-load_dotenv()
+env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(dotenv_path=env_path, override=True)
 
 # Read database configuration from environment variables
 db_host = getenv("DB_HOST")
@@ -20,6 +22,9 @@ db_name = getenv("DB_NAME")
 db_user = getenv("DB_USER")
 db_password = getenv("DB_PASSWORD")
 
+print(f"Using env file: {env_path}")
+print(f"db_host: {db_host}")
+print(f"db_user: {db_user}")
 # Fail early if required environment variables are missing
 if not db_host or not db_name or not db_user or not db_password:
     raise ValueError("Missing one or more required database environment variables.")
@@ -74,8 +79,8 @@ try:
                 team["full_name"],
                 team["abbreviation"],
                 team["city"],
-                team["conference"],
-                team["division"],
+                None,  # conference is not provided by teams.get_teams()
+                None,  # division is not provided by teams.get_teams()
             ),
         )
 
