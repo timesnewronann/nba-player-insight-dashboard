@@ -1,11 +1,8 @@
-public class PlayerRepository {
-    //Create PlayerRepository interface
+package com.timesnewronan.hoopiq_api.repository;
 
-    // make it extend JpaRepository
+import com.timesnewronan.hoopiq_api.entity.Player;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-    // tell it:
-    // entity type = player
-
-    // primary key type = Long
-
+// Gives us a read-made repository with build-in methods
+public interface PlayerRepository extends JpaRepository<Player, Long> {
 }

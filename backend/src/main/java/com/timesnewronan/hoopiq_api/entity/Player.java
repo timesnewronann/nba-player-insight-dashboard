@@ -9,10 +9,11 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "players")
 public class Player {
-    // add fields that match the table columns
+    // Marks the primary key field
     @Id
     private Long id;
 
+    // Maps the Java field nbaPlayerId to the DB column nba_player_id
     @Column(name = "nba_player_id", nullable = false, unique = true)
     private Integer nbaPlayerId;
 
@@ -40,9 +41,6 @@ public class Player {
     @Column(name = "active")
     private Boolean active;
 
-    // Map it to the players table
-
-    // Mark the primary key
     public Player() {
 
     }
@@ -76,7 +74,7 @@ public class Player {
         this.lastName = lastName;
     }
 
-    public string getFullName() {
+    public String getFullName() {
         return fullName;
     }
 

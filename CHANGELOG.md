@@ -16,21 +16,35 @@ Added
 
 Fixed
 
+## [1.0.2] - 04-05-2026
+
+### Added
+
+- Spring Boot PostgreSQL connection configuration
+- `Player` JPA entity mapped to the `players` table
+- `PlayerRepository` for database access
+- `GET /api/players` endpoint for returning player data as JSON
+
+### Verified
+
+- backend successfully connected to PostgreSQL 15
+- `/api/players` returned persisted NBA player records
+
 ## [1.0.1] - 04-05-2026
 
 Implemented an ETL script which reads configuration, connects to the nba_insight database, pulls external data from the nba_api, inserts the data into our schema, and can be rerun safely.
 
-## Added
+### Added
 
 - initial Python ETL script to load NBA teams and players into PostgreSQL
 - environment variable support for local databse configuration
 - upsert logic for rerunnable team and player ingestion
 
-## Changed
+### Changed
 
 - updated project README with current setup and ETL workflows notes
 
-## Fixed
+### Fixed
 
 - resolved local PostgreSQL role and environment variables loading issues
 - handled missing team fields from `nba_api` by storing nullable values
@@ -39,7 +53,7 @@ Implemented an ETL script which reads configuration, connects to the nba_insight
 
 Defined the project concept and MVP scope
 
-## Added
+### Added
 
 - Set up the Spring Boot backend project
 - Created the PostgreSQL database

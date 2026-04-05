@@ -550,3 +550,41 @@ GOAL:
 3. Controller
    The HTTP Layer
    "this is what exposes /api/players to the browser or curl"
+
+## Why getters and setters exist
+
+They let Spring/Jpa/Jackson:
+
+- read values
+- write values
+- serialize objects into JSON
+
+## Problem Solved:
+
+- Can the backend read real data from the database and expose it through an API
+
+Why this matters?
+This is your first complete backend slice:
+
+- Table exists
+- Entity maps to table
+- Repository reads rows
+- Controller exposes endpoint
+- Browser/curl gets JSON back
+
+1. Why does PlayerRepository extend JpaRepository<Player, Long>?
+   Because Spring Data JPA gives you built-in database methods like
+
+- findAll()
+- findById()
+- save()
+
+without you writing the implementation yourself.
+
+So the interface is like a contract, and Spring generates the working repository behind the scenes.
+
+2. Why do we need @Table(name = "players")?
+
+Because the Java class is named player, but the actual SQL table is named players
+
+
