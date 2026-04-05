@@ -162,3 +162,53 @@ commit transaction
 print counts/results
 close connection
 ```
+
+## April 4th 2026
+
+Mental Model:
+
+1. Grab team data from the NBA source
+2. Place it into your teams table
+3. Grab player data from the NBA source
+4. Place it into your players table
+5. Save the whole batch
+
+Question 1
+
+Why do we use ON CONFLICT (nba_team_id) instead of only INSERT?
+Purpose: Creates upsert behavior
+Upsert means:
+
+- insert if row is new
+- update if row already exists
+
+Why this matters ?
+
+- This is what makes the ETL script rerunnable
+
+This works because psycopg2 sends your SQL to Postgres and Postgres supports INSERT ... ON CONFLICT ... DO UPDATE agaisnt a unique key like nba_team_id
+
+Question 2
+
+Why are we okay putting None for team_id right now?
+We are putting None for team_id as a placeholder because our schema allows these columns to be nullable
+
+We are not pretending that we have data yet
+
+Question 3
+
+What is the difference between connection and cursor?
+A database connection is a physical communication channel between a client application and a database server.
+
+A cursor is a databse object used to retrieve and manipulate data from a result set one row at a time
+
+Simplified answer
+connection = the live session with PostgreSQL
+cursor = the object you use to execute SQL and fetch results through that session
+
+The connection creates cursor instances and the cursor is what executes commands and queries
+
+Question 4
+
+Why is commit() needed?
+Commit is needed to make the changes to the datbase permanent

@@ -27,7 +27,7 @@ if not db_host or not db_name or not db_user or not db_password:
 connection = psycopg2.connect(
     host=db_host,
     port=db_port,
-    name=db_name,
+    dbname=db_name,
     user=db_user,
     password=db_password,
 )
@@ -40,7 +40,7 @@ cursor = connection.cursor()
 # -------------------------
 
 # Get all the NBA teams from nba_api
-team_rows = team.get_teams()
+team_rows = teams.get_teams()
 
 # Loop through each team and insert it into the teams table
 for team in team_rows:
@@ -57,7 +57,7 @@ for team in team_rows:
         )
         VALUES (%s, %s, %s, %s, %s, %s)
         ON CONFLICT(nba_team_id)
-        DO UDPATE SET
+        DO UPDATE SET
             team_name = EXCLUDED.team_name,
             abbreviation = EXCLUDED.abbreviation,
             city = EXCLUDED.city,
@@ -111,7 +111,7 @@ for player in player_rows:
             player["full_name"],
             None,  # We are not filling team_id yet
             None,  # We are not filling position yet
-            None,  # We are not filling heigh yet
+            None,  # We are not filling height yet
             None,  # We are not filling weight yet
             player["is_active"],
         ),
