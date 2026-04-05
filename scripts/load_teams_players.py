@@ -45,9 +45,49 @@ team_rows = team.get_teams()
 # Loop through each team and insert it into the teams table
 for team in team_rows:
     # excute a command: Insert the teams into the teams table
-    cursor.execute()
+    cursor.execute(
+        """
+        INSERT INTO teams(
+            nba_team_id,
+            team_name,
+            abbreviation,
+            city,
+            conference,
+            division
+        )
+        VALUES (% s, % s, % s, % s, % s, % s)
+        ON CONFLICT(nba_team_id)
+        DO UDPATE SET
+            team_name = EXCLUDED.team_name,
+            abbreviation = EXCLUDED.abbreviation,
+            city = EXCLUDED.city,
+            conference = EXCLUDED.conference,
+            division = EXCLUDED.division
+        """,
+        (
+            team["id"],
+            team["full_name"],
+            team["abbreviation"],
+            team["city"],
+            team["conference"],
+            team["division"],
+        ),
+    )
 
-    # Make the changes to the database persistent
+# -------------------------
+# STEP 2: LOAD PLAYERS
+# -------------------------
+
+# Get all the NBA players
+player_rows = players.get_players()
+
+# Loop through each player and insert them into the players table
+for player in player_rows:
+    cursor.execute(
+
+    )
+
+# Make the changes to the database persistent
 connection.commit()
 
 # Close cursor and communication with the database
