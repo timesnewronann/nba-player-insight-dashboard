@@ -62,13 +62,16 @@ data/processed/
 # Java / Spring Boot
 # ------------------------------
 target/
+backend/target/
 *.class
 *.jar
 *.war
 *.ear
+*.iml
 
-# Maven wrapper logs
-.maven/
+# Maven wrapper logs / local Maven metadata
+.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
 
 # ------------------------------
 # Node / frontend
