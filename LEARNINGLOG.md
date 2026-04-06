@@ -587,4 +587,102 @@ So the interface is like a contract, and Spring generates the working repository
 
 Because the Java class is named player, but the actual SQL table is named players
 
+## Search Player feature
 
+V1 Search:
+
+- search by player name
+- support partial matches
+- ignore uppercase vs lowercase
+- return a small clean response
+- sort results alphabetically
+
+` GET /api/players/search?q=lebron
+
+Feature Flow
+
+```
+Frontend search box
+    ->
+GET /api/players/search?q=lebron
+    ->
+Controller
+    ->
+Service
+    ->
+Repository
+    ->
+PostgreSQL players table
+    ->
+matching player rows
+    ->
+JSON response
+```
+
+Fllows the layered structure we want in Spring Boot REST apps
+Controllers expose HTTP endpoints and repository methods handle database access
+Spring's REST guides use @RestController and request mappings for that endpoint layer, and Spring Data JPA supports derived query such as Containing and case-insensitive matching with IgnoreCase
+
+Main Idea:
+
+- Entity = maps Java to the players table
+- Repository = talks to the database
+- Service = business logic
+- Controller = HTTP layer
+- DTO = the response we send back
+
+Why use DTO?
+Even if your Player entity has many fields, the search screen does not need all of them.
+
+For example, search results probably one need:
+
+- id
+- nbaPlayerId
+- fullName
+- teamId
+- position
+- active
+
+They let us return only the data the UI needs instead of dumping the whole entity.
+
+# Psuedocode
+
+## Repository
+
+find players where full_name contains the search text
+ignore uppercase/lowercase
+order by full_name ascending
+limit to a reasonable number later if needed
+
+## Service Psuedocode
+
+receive search string q
+
+if q is blank:
+return empty list
+
+trim whitespace from q
+
+ask repository for matching players
+
+convert each Player entity into PlayerSearchResultDto
+
+return DTO list
+
+## Controller Psuedocode
+
+listen for GET /api/players/search
+
+read query parameter q
+call playerService.searchPlayers(q)
+
+return 200 OK with JSON list
+
+## The Search Method Idea
+
+Spring Data JPA lets you derive queries from repository method names, including Containing and IgnoreCase
+`List<Player> findByFullNameContainingIgnoreCaseOrderByFullNameAsc(String fullName);`
+
+- Containing = partial match
+- IgnoreCase = "lebron" and "LeBron" both work
+- OrderByFullNameAsc = stable alphabetical results
