@@ -16,6 +16,20 @@ Added
 
 Fixed
 
+## [1.0.3] - 04-06-2026
+
+### Added
+
+- added player search endpoint at /api/players/search
+- added PlayerService to separate controller and repository responsibilities
+- added custom repository query for searching full name, first name, or last name
+
+### Changed
+
+- PlayerController.java
+- PlayerRepository.java
+- PlayerService.java
+
 ## [1.0.2] - 04-05-2026
 
 ### Added
