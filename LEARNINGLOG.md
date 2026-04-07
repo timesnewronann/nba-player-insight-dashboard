@@ -587,4 +587,257 @@ So the interface is like a contract, and Spring generates the working repository
 
 Because the Java class is named player, but the actual SQL table is named players
 
+## Search Player feature
 
+V1 Search:
+
+- search by player name
+- support partial matches
+- ignore uppercase vs lowercase
+- return a small clean response
+- sort results alphabetically
+
+` GET /api/players/search?q=lebron
+
+Feature Flow
+
+```
+Frontend search box
+    ->
+GET /api/players/search?q=lebron
+    ->
+Controller
+    ->
+Service
+    ->
+Repository
+    ->
+PostgreSQL players table
+    ->
+matching player rows
+    ->
+JSON response
+```
+
+Fllows the layered structure we want in Spring Boot REST apps
+Controllers expose HTTP endpoints and repository methods handle database access
+Spring's REST guides use @RestController and request mappings for that endpoint layer, and Spring Data JPA supports derived query such as Containing and case-insensitive matching with IgnoreCase
+
+Main Idea:
+
+- Entity = maps Java to the players table
+- Repository = talks to the database
+- Service = business logic
+- Controller = HTTP layer
+- DTO = the response we send back
+
+Why use DTO?
+Even if your Player entity has many fields, the search screen does not need all of them.
+
+For example, search results probably one need:
+
+- id
+- nbaPlayerId
+- fullName
+- teamId
+- position
+- active
+
+They let us return only the data the UI needs instead of dumping the whole entity.
+
+# Psuedocode
+
+## Repository
+
+find players where full_name contains the search text
+ignore uppercase/lowercase
+order by full_name ascending
+limit to a reasonable number later if needed
+
+## Service Psuedocode
+
+receive search string q
+
+if q is blank:
+return empty list
+
+trim whitespace from q
+
+ask repository for matching players
+
+convert each Player entity into PlayerSearchResultDto
+
+return DTO list
+
+## Controller Psuedocode
+
+listen for GET /api/players/search
+
+read query parameter q
+call playerService.searchPlayers(q)
+
+return 200 OK with JSON list
+
+## The Search Method Idea
+
+Spring Data JPA lets you derive queries from repository method names, including Containing and IgnoreCase
+`List<Player> findByFullNameContainingIgnoreCaseOrderByFullNameAsc(String fullName);`
+
+- Containing = partial match
+- IgnoreCase = "lebron" and "LeBron" both work
+- OrderByFullNameAsc = stable alphabetical results
+
+## Psuedocode:
+
+user sends GET /api/players/search?name=lebron
+
+controller receives the "name" query parameter
+
+controller calls repository search method
+
+repository finds players where full_name contains "lebron"
+or first_name contains "lebron"
+or last_name contains "lebron"
+
+controller returns matching players as JSON
+
+`findByFullNameContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase`
+Spring Data JPA can generate queries from method names.
+
+- look in fullName
+- or firstName
+- or lastName
+- use contains
+- ignore uppercase/lowercase differences
+
+Return players wehre the search text appears in:
+
+- full name
+- first name
+- last name
+
+Examples:
+
+- lebron
+- james
+- steph
+- curry
+
+Use a custom @Query to avoid the long name of findByFullNameContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase
+Why is this better?
+
+- method name stays short: searchPlayers
+- query logic is explicit
+- easier to edit later
+- easier to teach and reason about
+  Example:
+
+```
+@Query("""
+    SELECT p
+    FROM Player p
+    WHERE LOWER(p.fullName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+       OR LOWER(p.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+       OR LOWER(p.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+""")
+List<Player> searchPlayers(@Param("searchTerm") String searchTerm);
+```
+
+## Psuedocode:
+
+1. User sends a search request with a query string
+2. Controller receives the request
+3. Controller passes the query string to the service
+4. Service checks:
+   - is the query null?
+   - is it blank?
+   - should we trim spaces?
+5. Service calls repository search method
+6. Repository runs query against Player table
+7. Matching players are returned
+8. Controller sends results back as JSON
+
+PlayerController.java handles the web request
+Ex:
+
+- receives /api/players/search?query=steph
+
+PlayerService.java handles application logic
+Ex:
+
+- trims extra spaces
+- checks if the query is blank
+- decides what to return
+
+PlayerRepository.java handles database access
+Ex:
+
+- search full_name, first_name, and last_name
+
+Repository classes are where data access and search behavior belong.
+"A mechanism for encapsulating storage, retrieval, and search behavior which emulates a collection of objects"
+
+If the user searches: Steph
+
+The repository checks whether:
+
+- fullName contains "steph"
+- or firstName contains "steph"
+- or lastName contains "steph"
+
+so "stephen curry" should match
+
+PlayerService.java file sits between the controller and the repository
+It's job is to hold app logic that is not specifically HTTP handling and not specifically database access.
+Spring's @Service javadoc describes it as a business service facade
+
+Repostiory Bean: an object that provides data access logic and is managed by the Spring Inversion Of Control Container
+
+Without PlayerService.java, the controller might start doing things like:
+
+- trimming input
+- checking for blank input
+- deciding what to return
+- later mapping entities to DTOs
+
+That makes the controller too busy
+Having PlayerService.java keeps responsibilites sepearated
+
+PlayerController = HTTP
+Service = app logic
+Repository = database
+
+# @RequestMapping
+
+You can use @RequestMapping annotation to map requests to controllers methods
+
+1. Browser sends GET /api/players/search?query=steph
+2. PlayerController receives the request
+3. PlayerController sends "steph" to PlayerService
+4. PlayerService checks if it is blank and trims it
+5. PlayerService calls PlayerRepository
+6. PlayerRepository runs the database search
+7. Matching players come back
+8. Spring returns them as JSON
+
+The controller broke because I had one field for repository and one field for service
+"I know how to set playerRepository but waht about playerService? It is final so I need it initialized too"
+
+Fixed endpoints
+@RequestMapping("/api/players")
+plus @GetMapping ("/api/players")
+
+became api/players/api/players
+I removed the unnecessary endpoint for getAllPlayers
+
+We can now ask the API directly rather than query from postgres
+
+## Use the browser/Postman when you want to test:
+“Does my endpoint work?”
+“Does my controller/service/repository chain work?”
+“What JSON comes back?”
+
+## Use PostgreSQL terminal when you want to test:
+“Is the data actually in the table?”
+“Did my script insert what I expected?”
+“Is this a backend bug or a database/data bug?”
