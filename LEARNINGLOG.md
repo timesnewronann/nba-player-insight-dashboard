@@ -806,3 +806,38 @@ Having PlayerService.java keeps responsibilites sepearated
 PlayerController = HTTP
 Service = app logic
 Repository = database
+
+# @RequestMapping
+
+You can use @RequestMapping annotation to map requests to controllers methods
+
+1. Browser sends GET /api/players/search?query=steph
+2. PlayerController receives the request
+3. PlayerController sends "steph" to PlayerService
+4. PlayerService checks if it is blank and trims it
+5. PlayerService calls PlayerRepository
+6. PlayerRepository runs the database search
+7. Matching players come back
+8. Spring returns them as JSON
+
+The controller broke because I had one field for repository and one field for service
+"I know how to set playerRepository but waht about playerService? It is final so I need it initialized too"
+
+Fixed endpoints
+@RequestMapping("/api/players")
+plus @GetMapping ("/api/players")
+
+became api/players/api/players
+I removed the unnecessary endpoint for getAllPlayers
+
+We can now ask the API directly rather than query from postgres
+
+## Use the browser/Postman when you want to test:
+“Does my endpoint work?”
+“Does my controller/service/repository chain work?”
+“What JSON comes back?”
+
+## Use PostgreSQL terminal when you want to test:
+“Is the data actually in the table?”
+“Did my script insert what I expected?”
+“Is this a backend bug or a database/data bug?”

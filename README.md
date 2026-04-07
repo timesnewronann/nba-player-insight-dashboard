@@ -21,6 +21,23 @@ This project currently has:
 source .venv/bin/activate
 ```
 
+### 2. Ingest nba_api data
+
+### 3. Run the springboot app
+
+```
+cd backend
+./mvnw spring-boot:run
+```
+
+### 4. connect to Postgres
+
+psql -U postgres -d nba_player_insight
+
+### 5. inside psql, list tables
+
+\dt
+
 ## Why I Built This
 
 I wanted to create a project that connects my love of the game with the kinds of technical skills used in software engineering.

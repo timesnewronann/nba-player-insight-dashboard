@@ -26,8 +26,7 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-    // Maps HTTP GET requests for /api/players to this Java methods
-    @GetMapping("/api/players")
+    @GetMapping
     public List<Player> getAllPlayers() {
         // fetches every row in the players table
         return playerService.getAllPlayers();
@@ -36,7 +35,7 @@ public class PlayerController {
     // Add a new endpoint that accepts a query parameter
     // This query request for a specific player
     // EX: /api/players/search?query=Lebron
-    @GetMapping("/api/players")
+    @GetMapping("/search")
     public List<Player> searchPlayers(@RequestParam("query") String query) {
         // Controller job
         // receive the HTTP input and pass it to the service's layer

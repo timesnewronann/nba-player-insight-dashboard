@@ -19,6 +19,12 @@ public class PlayerService {
         this.playerRepository = playerRepository;
     }
 
+    // getAllPlayers method
+    // Return every player in the database
+    public List<Player> getAllPlayers() {
+        return playerRepository.findAll();
+    }
+
     public List<Player> searchPlayers(String query) {
         // If the query is null or only spaces -> return an empty list
         // no need to run a pointless query
