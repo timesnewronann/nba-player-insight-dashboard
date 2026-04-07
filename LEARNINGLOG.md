@@ -686,3 +686,123 @@ Spring Data JPA lets you derive queries from repository method names, including 
 - Containing = partial match
 - IgnoreCase = "lebron" and "LeBron" both work
 - OrderByFullNameAsc = stable alphabetical results
+
+## Psuedocode:
+
+user sends GET /api/players/search?name=lebron
+
+controller receives the "name" query parameter
+
+controller calls repository search method
+
+repository finds players where full_name contains "lebron"
+or first_name contains "lebron"
+or last_name contains "lebron"
+
+controller returns matching players as JSON
+
+`findByFullNameContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase`
+Spring Data JPA can generate queries from method names.
+
+- look in fullName
+- or firstName
+- or lastName
+- use contains
+- ignore uppercase/lowercase differences
+
+Return players wehre the search text appears in:
+
+- full name
+- first name
+- last name
+
+Examples:
+
+- lebron
+- james
+- steph
+- curry
+
+Use a custom @Query to avoid the long name of findByFullNameContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase
+Why is this better?
+
+- method name stays short: searchPlayers
+- query logic is explicit
+- easier to edit later
+- easier to teach and reason about
+  Example:
+
+```
+@Query("""
+    SELECT p
+    FROM Player p
+    WHERE LOWER(p.fullName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+       OR LOWER(p.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+       OR LOWER(p.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+""")
+List<Player> searchPlayers(@Param("searchTerm") String searchTerm);
+```
+
+## Psuedocode:
+
+1. User sends a search request with a query string
+2. Controller receives the request
+3. Controller passes the query string to the service
+4. Service checks:
+   - is the query null?
+   - is it blank?
+   - should we trim spaces?
+5. Service calls repository search method
+6. Repository runs query against Player table
+7. Matching players are returned
+8. Controller sends results back as JSON
+
+PlayerController.java handles the web request
+Ex:
+
+- receives /api/players/search?query=steph
+
+PlayerService.java handles application logic
+Ex:
+
+- trims extra spaces
+- checks if the query is blank
+- decides what to return
+
+PlayerRepository.java handles database access
+Ex:
+
+- search full_name, first_name, and last_name
+
+Repository classes are where data access and search behavior belong.
+"A mechanism for encapsulating storage, retrieval, and search behavior which emulates a collection of objects"
+
+If the user searches: Steph
+
+The repository checks whether:
+
+- fullName contains "steph"
+- or firstName contains "steph"
+- or lastName contains "steph"
+
+so "stephen curry" should match
+
+PlayerService.java file sits between the controller and the repository
+It's job is to hold app logic that is not specifically HTTP handling and not specifically database access.
+Spring's @Service javadoc describes it as a business service facade
+
+Repostiory Bean: an object that provides data access logic and is managed by the Spring Inversion Of Control Container
+
+Without PlayerService.java, the controller might start doing things like:
+
+- trimming input
+- checking for blank input
+- deciding what to return
+- later mapping entities to DTOs
+
+That makes the controller too busy
+Having PlayerService.java keeps responsibilites sepearated
+
+PlayerController = HTTP
+Service = app logic
+Repository = database

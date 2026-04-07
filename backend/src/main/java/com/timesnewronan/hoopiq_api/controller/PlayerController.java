@@ -1,6 +1,5 @@
 package com.timesnewronan.hoopiq_api.controller;
 
-
 import com.timesnewronan.hoopiq_api.entity.Player;
 import com.timesnewronan.hoopiq_api.repository.PlayerRepository;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+// (Entry Point) Handles incoming HTTP rquests (ex GET, POST) acts a "traffic cop" that receives data from the user, calls the appropriate service to process it, and returns a response
 // Tells Spring this class handles HTTP request and returns data directly as JSON
 @RestController
 public class PlayerController {
@@ -25,4 +25,6 @@ public class PlayerController {
         // fetches every row in the players table
         return playerRepository.findAll();
     }
+
+    // Add a new endpoint that accepts a query parameter
 }

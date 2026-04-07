@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 // Create a player class
+// Represents the player table from our database
 @Entity
 @Table(name = "players")
 public class Player {
