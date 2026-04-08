@@ -25,6 +25,7 @@ public class PlayerService {
         return playerRepository.findAll();
     }
 
+    // Return players that match the search query
     public List<Player> searchPlayers(String query) {
         // If the query is null or only spaces -> return an empty list
         // no need to run a pointless query
@@ -40,4 +41,19 @@ public class PlayerService {
         return playerRepository.searchPlayers(cleanedQuery);
 
     }
+
+    /*
+     * Add a new method that:
+     * - accepts an id
+     * - asks the repository for that player
+     * - returns the player if found
+     */
+
+    public Player getPlayerById(Long id) {
+        // findById returns an Optional<Player>
+        // If the player exists, return it
+        // If not, throw an exception with a clear message
+        return playerRepository.findById(id).orElseThrow(() -> new RuntimeException("Player not found with id: " + id));
+    }
+    
 }

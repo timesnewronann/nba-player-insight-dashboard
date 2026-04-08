@@ -5,6 +5,7 @@ import com.timesnewronan.hoopiq_api.entity.Player;
 import com.timesnewronan.hoopiq_api.service.PlayerService;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,5 +41,13 @@ public class PlayerController {
         // Controller job
         // receive the HTTP input and pass it to the service's layer
         return playerService.searchPlayers(query);
+    }
+
+    // Adding a new route that reads the player id from the URL
+    // EX: /api/players/1
+    // PathVariable means Spring pulls the id from the URL path
+    @GetMapping("/{id}")
+    public Player getPlayerById(@PathVariable Long id) {
+        return playerService.getPlayerById(id);
     }
 }
