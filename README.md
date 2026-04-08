@@ -12,7 +12,8 @@ This project currently has:
 - a PostgreSQL database created locally
 - SQL tables for `teams`, `players`, and `player_season_stats`
 - a Python environment for ETL / ingestion work
-- a search query
+- a search query that searches by first name, last name, or full name
+- a search query that searches by playerId
 
 ### 1. Activate the Python virtual environment
 
