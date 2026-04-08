@@ -833,11 +833,49 @@ I removed the unnecessary endpoint for getAllPlayers
 We can now ask the API directly rather than query from postgres
 
 ## Use the browser/Postman when you want to test:
+
 “Does my endpoint work?”
 “Does my controller/service/repository chain work?”
 “What JSON comes back?”
 
 ## Use PostgreSQL terminal when you want to test:
+
 “Is the data actually in the table?”
 “Did my script insert what I expected?”
 “Is this a backend bug or a database/data bug?”
+
+## Next Endpoint
+
+Fetch one player by id
+
+## GET /api/players/1
+
+search for a player -> click a player -> load that player's details
+
+## Why this Works
+
+`findById(id)`
+We don't have to write this yourself in the repository because it already comes from JpaRepository.
+Spring Data JPA's repository model provides common data access methods and lets you add custom ones when needed.
+
+It Returns Optional<Player>
+Spring uses Optional for cases where a row may or may not exist.
+
+That means:
+
+- Maybe a player with id 1 exists
+- Maybe a player with id 999999 does not
+
+Why we use orElseThrow(...)
+Because we want a clear failure instead of returning null silently.
+
+## Why @PathVariable is used here
+
+The id is part of the URL path itself
+`/api/players/1`
+
+not a query
+`/api/players/search?query=lebron`
+
+- @RequestParam -> reads from ?query=...
+- @PathVariable -> reads from /players/{id}
