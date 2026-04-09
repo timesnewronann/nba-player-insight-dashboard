@@ -1,6 +1,7 @@
 package com.timesnewronan.hoopiq_api.controller;
 
 import com.timesnewronan.hoopiq_api.entity.Player;
+import com.timesnewronan.hoopiq_api.entity.PlayerSeasonStat;
 // import com.timesnewronan.hoopiq_api.repository.PlayerRepository;
 import com.timesnewronan.hoopiq_api.service.PlayerService;
 
@@ -49,5 +50,12 @@ public class PlayerController {
     @GetMapping("/{id}")
     public Player getPlayerById(@PathVariable Long id) {
         return playerService.getPlayerById(id);
+    }
+
+    // Adding a new endpoint to get the player's season stats
+
+    @GetMapping("/{id}/season-stats")
+    public List<PlayerSeasonStat> getSeasonStatsByPlayerId(@PathVariable Long id) {
+        return playerService.getSeasonStatsByPlayerId(id);
     }
 }
