@@ -900,4 +900,11 @@ Database Table:
 player_season_stats
 PlayerSeasonStat.java
 
+## Why findByPlayerId works?
 
+Because PlayerSeasonStat has this field:
+`private Player player;`
+Spring understands:
+`findByPlayerId(Long playerId)`
+
+"Find all PlayerSeasonStat rows where player.id = ?"
