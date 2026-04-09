@@ -68,14 +68,54 @@ try:
     cursor = connection.cursor()
 
     # -------------------------
-    # STEP 1: LOAD PLAYERS
+    # STEP 4: BUILD PLAYER ID LOOKUP
     # -------------------------
 
-    # Get all NBA players from nba_api
-    player = players.get_player()
+    # Translate NBA player IDs from nba_api into our database's internal player IDs.
+    # Ex:
+    # players.nba_player_id = 203518 -> players.id = 10
+    # Load this mapping into a dictionary to achieve fast lookup
+    cursor.execute(
+        """
+        SELECT id, nba_player_id
+        FROM players
+        """
+    )
+
+    # grab all the rows
+    player_lookup_rows = cursor.fetchall()
+
+    # use a dictionary for fast lookup
+    nba_player_id_to_db_player_id = {}
+
+    # build the dictionary
+    for db_player_id, nba_player_id in player_lookup_rows:
+        # translate the player id key -> value is our db player_id
+        nba_player_id_to_db_player_id[nba_player_id] = db_player_id
+
+    # print statement to check that we successfully mapped the ids
+    print(f"Loaded {len(nba_player_id_to_db_player_id)} player id mappings from the database.")
+
+    # -------------------------
+    # STEP 5: FETCH SEASON STATS FROM NBA API
+    # -------------------------
+
+    # This endpoint gives us player season stats across the league for the selected season.
+    season_stats_response = leaguedashplayerstats.LeagueDashPlayerStats(
+        season=season_to_load
+    )
+
+    # Convert the response into a pandas dataframe to access the row easier
+    season_stats_dataframe = season_stats_response.get_data_frames()[0]
+
+    print(f"Fetched {len(season_stats_dataframe)} sesaon stat rows from nba_api for {season_to_load}.")
+
+    # -------------------------
+    # STEP 6: LOOP THROUGH EACH STATS ROW
+    # -------------------------
 
     # Insert or update each team
-    for team in team_rows:
+    for player in leaguedashplayerstats:
         cursor.execute(
             """
             INSERT INTO player_season_stats (
