@@ -1,7 +1,9 @@
 package com.timesnewronan.hoopiq_api.service;
 
 import com.timesnewronan.hoopiq_api.entity.Player;
+import com.timesnewronan.hoopiq_api.entity.PlayerSeasonStat;
 import com.timesnewronan.hoopiq_api.repository.PlayerRepository;
+import com.timesnewronan.hoopiq_api.repository.PlayerSeasonStatRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -12,11 +14,13 @@ public class PlayerService {
     // We store the repository as a dependency because the service needs it to fetch
     // player data from the databse
     private final PlayerRepository playerRepository;
+    private final PlayerSeasonStatRepository playerSeasonStatRepository;
 
     // Constructor injection is the preferred Spring style
     // Spring will automatically pass in the PlayerRepository
-    public PlayerService(PlayerRepository playerRepository) {
+    public PlayerService(PlayerRepository playerRepository, PlayerSeasonStatRepository playerSeasonStatRepository) {
         this.playerRepository = playerRepository;
+        this.playerSeasonStatRepository = playerSeasonStatRepository;
     }
 
     // getAllPlayers method
@@ -55,5 +59,17 @@ public class PlayerService {
         // If not, throw an exception with a clear message
         return playerRepository.findById(id).orElseThrow(() -> new RuntimeException("Player not found with id: " + id));
     }
-    
+
+    /*
+     * Method that gets all season stats for one player
+     */
+    public List<PlayerSeasonStat> getSeasonStatsByPlayerId(Long playerId) {
+        // Verify that player exists
+        // This will give us a failure if someone requests stats for a nonexistent
+        // player id
+        getPlayerById(playerId);
+
+        // fetch all season stat rows for the requested player
+        return playerSeasonStatRepository.findByPlayerId(playerId);
+    }
 }

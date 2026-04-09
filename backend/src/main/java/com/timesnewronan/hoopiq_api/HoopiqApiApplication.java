@@ -11,6 +11,6 @@ public class HoopiqApiApplication {
 		SpringApplication.run(HoopiqApiApplication.class, args);
 	}
 
-	// Add an ew search method
+	// Add a new search method
 
 }
