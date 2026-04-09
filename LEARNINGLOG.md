@@ -879,3 +879,25 @@ not a query
 
 - @RequestParam -> reads from ?query=...
 - @PathVariable -> reads from /players/{id}
+
+# Player season stats
+
+`GET /api/players/{id}/season-stats`
+
+## Example
+
+`GET /api/players/1/season-stats`
+
+Find the player with databse id 1, then return that player's season stats rows
+
+PlayerSeasonStat.java tells spring:
+
+- what table to use
+- what columns exist
+- what Java fields map to those columns
+
+Database Table:
+player_season_stats
+PlayerSeasonStat.java
+
+
