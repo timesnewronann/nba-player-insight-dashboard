@@ -33,15 +33,34 @@ public class PlayerSeasonStat {
     private String season;
 
     // player season stats variables
+    @Column(name = "games_played")
     private Integer gamesPlayed;
+
+    @Column(name = "minutes_per_game")
     private BigDecimal minutesPerGame;
+
+    @Column(name = "points_per_game")
     private BigDecimal pointsPerGame;
+
+    @Column(name = "rebounds_per_game")
     private BigDecimal reboundsPerGame;
+
+    @Column(name = "assists_per_game")
     private BigDecimal assistsPerGame;
+
+    @Column(name = "steals_per_game")
     private BigDecimal stealsPerGame;
+
+    @Column(name = "blocks_per_game")
     private BigDecimal blocksPerGame;
+
+    @Column(name = "field_goal_pct")
     private BigDecimal fieldGoalPct;
+
+    @Column(name = "three_point_pct")
     private BigDecimal threePointPct;
+
+    @Column(name = "free_throw_pct")
     private BigDecimal freeThrowPct;
 
     public PlayerSeasonStat() {
