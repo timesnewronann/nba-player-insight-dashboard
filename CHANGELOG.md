@@ -16,6 +16,13 @@ Added
 
 Fixed
 
+## [1.0.4] - 04-07-2026
+
+### Added
+
+- added a player search endpoint at /api/players/{id}
+- example: /api/players/1
+
 ## [1.0.3] - 04-06-2026
 
 ### Added
