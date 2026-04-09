@@ -104,5 +104,73 @@ public class PlayerSeasonStat {
     }
 
     // getter to get the rebounds per game
+    public BigDecimal getReboundsPerGame() {
+        return reboundsPerGame;
+    }
+
+    // setter to set the rebounds per game
+    public void setReboundsPerGame(BigDecimal reboundsPerGame) {
+        this.reboundsPerGame = reboundsPerGame;
+    }
+
+    // getter to get the assists per game
+    public BigDecimal getAssistsPerGame() {
+        return assistsPerGame;
+    }
+
+    // setter to set the assists per game
+    public void setAssistsPerGame(BigDecimal assistsPerGame) {
+        this.assistsPerGame = assistsPerGame;
+    }
+
+    // getter to get the steals per game
+    public BigDecimal getStealsPerGame() {
+        return stealsPerGame;
+    }
+
+    // setter to set the steals per game
+    public void setStealsPerGame(BigDecimal stealsPerGame) {
+        this.stealsPerGame = stealsPerGame;
+    }
+
+    // getter to get the blocks per game
+    public BigDecimal getBlocksPerGame() {
+        return blocksPerGame;
+    }
+
+    // setter to set the blocks per game
+    public void setBlocksPerGame(BigDecimal blocksPerGame) {
+        this.blocksPerGame = blocksPerGame;
+    }
+
+    // getter to get the field goal percentage
+    public BigDecimal getFieldGoalPct() {
+        return fieldGoalPct;
+    }
+
+    // setter to set the field goal percentage
+    public void setFieldGoalPct(BigDecimal fieldGoalPct) {
+        this.fieldGoalPct = fieldGoalPct;
+    }
+
+    // getter to get the 3pt percentage
+    public BigDecimal getThreePointPct() {
+        return threePointPct;
+    }
+
+    // setter to set the 3pt percentage
+    public void setThreePointPct(BigDecimal threePointPct) {
+        this.threePointPct = threePointPct;
+    }
+
+    // getter to get the free throw percentage
+    public BigDecimal getFreeThrowPct() {
+        return freeThrowPct;
+    }
+
+    // setter to set the free throw percentage
+    public void setFreeThrowPct(BigDecimal freeThrowPct) {
+        this.freeThrowPct = freeThrowPct;
+    }
 
 }
