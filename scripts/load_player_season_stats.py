@@ -113,7 +113,65 @@ try:
     # -------------------------
     # STEP 6: LOOP THROUGH EACH STATS ROW
     # -------------------------
+    for _, row in season_stats_dataframe.iterrows():
+        nba_player_id = row["PLAYER_ID"]
 
+        # If the NBA player id is not in our local players table, skip it.
+        # Protects from inserting orphaned season stats rows
+        if nba_player_id not in nba_player_id_to_db_player_id:
+            skipped_count += 1
+            continue
+
+        # Get the internal database player id
+        db_player_id = nba_player_id_to_db_player_id[nba_player_id]
+
+        # Insert the season stats row into our table.
+        # ON CONFLICT makes the script able to be reran
+        cursor.execute(
+            """
+            INSERT INTO player_season_stats (
+                player_id,
+                season,
+                games_played,
+                minutes_per_game,
+                points_per_game,
+                rebounds_per_game,
+                assists_per_game,
+                steals_per_game,
+                blocks_per_game,
+                field_goal_pct,
+                three_point_pct,
+                free_throw_pct
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (player_id, season)
+            DO UPDATE SET
+                games_played = EXCLUDED.games_played,
+                minutes_per_game = EXCLUDED.minutes_per_game,
+                points_per_game = EXCLUDED.points_per_game,
+                rebounds_per_game = EXCLUDED.rebounds_per_game,
+                assists_per_game = EXCLUDED.assists_per_game,
+                steals_per_game = EXCLUDED.steals_per_game,
+                blocks_per_game = EXCLUDED.blocks_per_game,
+                field_goal_pct = EXCLUDED.field_goal_pct,
+                three_point_pct = EXCLUDED.three_point_pct,
+                free_throw_pct = EXCLUDED.free_throw_pct
+            """,
+            (
+                db_player_id,
+                season_to_load,
+                row["GP"],       # Games Played
+                row["MIN"],      # Minutes Per Game
+                row["PTS"],      # Points Per Game
+                row["REB"],      # Rebounds Per Game
+                row["AST"],      # Assists Per Game
+                row["STL"],      # Steals Per Game
+                row["BLK"],      # Blocks Per Game
+                row["FG_PCT"],   # Field Goal Percentage
+                row["FG3_PCT"],  # Three Point Percentage
+                row["FT_PCT"],   # Free Throw Percentage
+            ),
+        )
     # Insert or update each team
     for player in leaguedashplayerstats:
         cursor.execute(
