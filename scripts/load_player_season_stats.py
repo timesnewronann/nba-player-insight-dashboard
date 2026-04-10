@@ -172,86 +172,18 @@ try:
                 row["FT_PCT"],   # Free Throw Percentage
             ),
         )
-    # Insert or update each team
-    for player in leaguedashplayerstats:
-        cursor.execute(
-            """
-            INSERT INTO player_season_stats (
-                nba_team_id,
-                team_name,
-                abbreviation,
-                city,
-                conference,
-                division
-            )
-            VALUES (%s, %s, %s, %s, %s, %s)
-            ON CONFLICT (nba_team_id)
-            DO UPDATE SET
-                team_name = EXCLUDED.team_name,
-                abbreviation = EXCLUDED.abbreviation,
-                city = EXCLUDED.city,
-                conference = EXCLUDED.conference,
-                division = EXCLUDED.division
-            """,
-            (
-                team["id"],
-                team["full_name"],
-                team["abbreviation"],
-                team["city"],
-                None,  # conference is not provided by teams.get_teams()
-                None,  # division is not provided by teams.get_teams()
-            ),
-        )
+
+        # increment the inserted or updated counter
+        inserted_or_updated_count += 1
 
     # -------------------------
-    # STEP 2: LOAD PLAYERS
+    # STEP 7: COMMIT CHANGES
     # -------------------------
 
-    # Get all NBA players from nba_api
-    player_rows = players.get_players()
-
-    # Insert or update each player
-    for player in player_rows:
-        cursor.execute(
-            """
-            INSERT INTO players (
-                nba_player_id,
-                first_name,
-                last_name,
-                full_name,
-                team_id,
-                position,
-                height,
-                weight,
-                active
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (nba_player_id)
-            DO UPDATE SET
-                first_name = EXCLUDED.first_name,
-                last_name = EXCLUDED.last_name,
-                full_name = EXCLUDED.full_name,
-                active = EXCLUDED.active
-            """,
-            (
-                player["id"],
-                player["first_name"],
-                player["last_name"],
-                player["full_name"],
-                None,  # We are not filling team_id yet
-                None,  # We are not filling position yet
-                None,  # We are not filling height yet
-                None,  # We are not filling weight yet
-                player["is_active"],
-            ),
-        )
-
-    # Save all successful changes
     connection.commit()
 
-    # Print a success summary
-    print(f"Loaded or updated {len(team_rows)} teams.")
-    print(f"Loaded or updated {len(player_rows)} players.")
+    print(f"Inserted or updated {inserted_or_updated_count} player season stat rows.")
+    print(f"Skipped {skipped_count} rows because no matching player was found in the local database.")
 
 except Exception as error:
     # Roll back the current transaction if something fails
@@ -259,7 +191,7 @@ except Exception as error:
         connection.rollback()
 
     # Show the error so we know what went wrong
-    print(f"ETL script failed: {error}")
+    print(f"Season stats ETL script failed: {error}")
     raise
 
 finally:
