@@ -908,3 +908,170 @@ Spring understands:
 `findByPlayerId(Long playerId)`
 
 "Find all PlayerSeasonStat rows where player.id = ?"
+
+Player Season stats table was empty
+Need to ingest player season stats and build the table
+
+```
+GET /api/players/1/season-stats
+    ->
+Spring Boot endpoint works
+    ->
+Repository query works
+    ->
+Database returns no matching rows
+    ->
+[]
+```
+
+## Ingest season stats from Python into PostgreSQL
+
+### High Level overview of Python Ingestion
+
+```
+1. Fetch season stats data from nba_api
+2. Transform the response into my database shape
+3. Match each stat row to my interal players.id
+4. Insert rows into player_season_stats
+```
+
+## Key understanding
+
+player_season_stats table does not use nba_player_id directly as its foreign key
+it uses player_id points to players.id
+
+## Ingestion Logic
+
+1. Look up the player in players table using nba_player_id
+2. Get the row's internal id
+3. Insert season stats using that internal player_id
+
+## Inspect player rows
+
+```
+nba_player_insight=# SELECT id, nba_player_id, full_name
+nba_player_insight-# FROM players
+nba_player_insight-# ORDER BY id
+nba_player_insight-# LIMIT 10;
+ id | nba_player_id |      full_name
+----+---------------+---------------------
+  1 |         76001 | Alaa Abdelnaby
+  2 |         76002 | Zaid Abdul-Aziz
+  3 |         76003 | Kareem Abdul-Jabbar
+  4 |            51 | Mahmoud Abdul-Rauf
+  5 |          1505 | Tariq Abdul-Wahad
+  6 |           949 | Shareef Abdur-Rahim
+  7 |         76005 | Tom Abernethy
+  8 |         76006 | Forest Able
+  9 |         76007 | John Abramovic
+ 10 |        203518 | Alex Abrines
+```
+
+## Player season stats table structure
+
+```
+nba_player_insight=# \d player_season_stats
+                                            Table "public.player_season_stats"
+      Column       |            Type             | Collation | Nullable |                     Default
+-------------------+-----------------------------+-----------+----------+-------------------------------------------------
+ id                | bigint                      |           | not null | nextval('player_season_stats_id_seq'::regclass)
+ player_id         | bigint                      |           | not null |
+ season            | character varying(20)       |           | not null |
+ games_played      | integer                     |           |          |
+ minutes_per_game  | numeric(5,2)                |           |          |
+ points_per_game   | numeric(5,2)                |           |          |
+ rebounds_per_game | numeric(5,2)                |           |          |
+ assists_per_game  | numeric(5,2)                |           |          |
+ steals_per_game   | numeric(5,2)                |           |          |
+ blocks_per_game   | numeric(5,2)                |           |          |
+ field_goal_pct    | numeric(5,3)                |           |          |
+ three_point_pct   | numeric(5,3)                |           |          |
+ free_throw_pct    | numeric(5,3)                |           |          |
+ created_at        | timestamp without time zone |           |          | CURRENT_TIMESTAMP
+:
+```
+
+## Python script Psuedocode
+
+```
+1. Connect to the database
+2. Query the players table and build a dictionary:
+   nba_player_id -> internal player id
+
+3. Fetch season stats from nba_api
+4. Loop through each season stats row
+5. Read the nba player id from that row
+6. Check if that nba player id exists in our local players table
+   - if not, skip it
+
+7. Convert the season stats row into our database columns
+8. Insert into player_season_stats using internal player_id
+9. Use ON CONFLICT (player_id, season) to update existing rows or skip duplicates
+10. Commit the transaction
+11. Print how many rows were inserted/updated/skipped
+```
+
+The NBA api gives us PLAYER_ID but our table needs player_id, so we build a Python dictionary that translates between them
+
+## Why ON CONFLCIT matters
+
+Our table relies on a unique rule (player_id, season)
+If we rerun the script for the smae season we do not want duplicate rows
+
+```
+ON CONFLICT (player_id, season)
+DO UPDATE SET ...
+```
+
+means: if that player-season already exists, update the stats instead of failing
+
+### How to Run
+
+From the project root
+
+```
+source venv/bin/activate
+python scripts/load_player_season_stats.py
+```
+
+How to verify it worked
+After the script runs, go into Postgres:
+
+```
+psql -d nba_player_insight
+```
+
+Then run:
+
+```
+SELECT COUNT(*) FROM player_season_stats;
+```
+
+Test a few rows:
+
+```
+SELECT *
+FROM player_season_stats
+LIMIT 10;
+```
+
+Test the join:
+
+```
+SELECT p.full_name, pss.season, pss.points_per_game
+FROM player_season_stats pss
+JOIN players p ON pss.player_id = p.id
+LIMIT 10;
+```
+
+Test the API:
+`http://localhost:8080/api/players/1/season-stats`
+
+# What I accomplished
+
+- Build the backend endpoint to fetch a player's season stats by internal player id.
+- When the endpoint returned an empty result, I investigated and found that the player_season_stats table had no data
+- To Fix that I created a new Python ETL script to load 2024-25 regular season player season stats from nba_api into PostgreSQL
+- The script first builds a lookup dictionary from players.nba_player_id to players.id so we can map external NBA player IDs to our internal database IDs efficiently.
+- Then it transforms the API response into our database schema and inserts the rows into player_season_stats using ON CONFLICT so the script is safe to rerun
+
