@@ -101,6 +101,8 @@ try:
     # -------------------------
 
     # This endpoint gives us player season stats across the league for the selected season.
+    # Request PerGame stats because our database columns are per-game fields:
+    # ex: points_per_game and minutes_per_game
     season_stats_response = leaguedashplayerstats.LeagueDashPlayerStats(
         season=season_to_load,
         per_mode_detailed="PerGame"
@@ -109,7 +111,7 @@ try:
     # Convert the response into a pandas dataframe to access the row easier
     season_stats_dataframe = season_stats_response.get_data_frames()[0]
 
-    print(f"Fetched {len(season_stats_dataframe)} sesaon stat rows from nba_api for {season_to_load}.")
+    print(f"Fetched {len(season_stats_dataframe)} season stat rows from nba_api for {season_to_load}.")
 
     # -------------------------
     # STEP 6: LOOP THROUGH EACH STATS ROW

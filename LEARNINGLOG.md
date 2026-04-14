@@ -1066,3 +1066,12 @@ LIMIT 10;
 
 Test the API:
 `http://localhost:8080/api/players/1/season-stats`
+
+# What I accomplished
+
+- Build the backend endpoint to fetch a player's season stats by internal player id.
+- When the endpoint returned an empty result, I investigated and found that the player_season_stats table had no data
+- To Fix that I created a new Python ETL script to load 2024-25 regular season player season stats from nba_api into PostgreSQL
+- The script first builds a lookup dictionary from players.nba_player_id to players.id so we can map external NBA player IDs to our internal database IDs efficiently.
+- Then it transforms the API response into our database schema and inserts the rows into player_season_stats using ON CONFLICT so the script is safe to rerun
+

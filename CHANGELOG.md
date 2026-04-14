@@ -16,6 +16,24 @@ Added
 
 Fixed
 
+## [1.0.5] - 04-13-2026
+
+### Future Improvements
+
+- Load more than one season
+- Eventually load 2025-26 regular season data
+- Possibly parameterize season_to_load
+- Possibly parameterize season_type_all_star and playoffs
+
+### Added
+
+- player_season_stats.py
+- player_season_stats data to the data table
+
+### Fixed
+
+- Missing data from player_season_stats data table
+
 ## [1.0.4] - 04-07-2026
 
 ### Added
