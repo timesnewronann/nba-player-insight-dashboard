@@ -1010,3 +1010,59 @@ nba_player_insight=# \d player_season_stats
 10. Commit the transaction
 11. Print how many rows were inserted/updated/skipped
 ```
+
+The NBA api gives us PLAYER_ID but our table needs player_id, so we build a Python dictionary that translates between them
+
+## Why ON CONFLCIT matters
+
+Our table relies on a unique rule (player_id, season)
+If we rerun the script for the smae season we do not want duplicate rows
+
+```
+ON CONFLICT (player_id, season)
+DO UPDATE SET ...
+```
+
+means: if that player-season already exists, update the stats instead of failing
+
+### How to Run
+
+From the project root
+
+```
+source venv/bin/activate
+python scripts/load_player_season_stats.py
+```
+
+How to verify it worked
+After the script runs, go into Postgres:
+
+```
+psql -d nba_player_insight
+```
+
+Then run:
+
+```
+SELECT COUNT(*) FROM player_season_stats;
+```
+
+Test a few rows:
+
+```
+SELECT *
+FROM player_season_stats
+LIMIT 10;
+```
+
+Test the join:
+
+```
+SELECT p.full_name, pss.season, pss.points_per_game
+FROM player_season_stats pss
+JOIN players p ON pss.player_id = p.id
+LIMIT 10;
+```
+
+Test the API:
+`http://localhost:8080/api/players/1/season-stats`
