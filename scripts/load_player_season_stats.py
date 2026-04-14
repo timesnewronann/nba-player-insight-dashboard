@@ -102,7 +102,8 @@ try:
 
     # This endpoint gives us player season stats across the league for the selected season.
     season_stats_response = leaguedashplayerstats.LeagueDashPlayerStats(
-        season=season_to_load
+        season=season_to_load,
+        per_mode_detailed="PerGame"
     )
 
     # Convert the response into a pandas dataframe to access the row easier
