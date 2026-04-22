@@ -1075,3 +1075,84 @@ Test the API:
 - The script first builds a lookup dictionary from players.nba_player_id to players.id so we can map external NBA player IDs to our internal database IDs efficiently.
 - Then it transforms the API response into our database schema and inserts the rows into player_season_stats using ON CONFLICT so the script is safe to rerun
 
+# feature/player-game-logs-endpoint
+
+1. Design the new tables
+2. Write the ingestion script
+3. Load the data
+4. Verify the SQL rows look correct
+5. Build the Spring endpoint
+
+We can use two data tables
+
+- games -> the game played
+- player_game_logs -> an individual player's performance for a game
+
+```
+A game exists on its own
+A player game log is a player's stat line for the one game
+Many players can belong to a single game M -> 1
+One player can have many game logs across many games 1 -> M
+
+teams <- games
+teams <- players
+players <- player game logs -> games
+```
+
+## games should not have player_id as its foreign key
+
+Because a game exists even before we focus on any single player
+
+- Lakers vs Warrios
+- On a certain date
+- On a certain season
+- with a certain NBA game id
+
+one game --> many player_game_logs
+one player --> many player_game logs
+
+## Games:
+
+One row = one nba game
+Primary Key:
+id
+
+Unique NBA field:
+nba_game_id
+
+Foreign Keys:
+home_team_id
+away_team_id
+
+Player_game_logs
+One row = one player's stat line in one NBA game
+
+Primary key:
+id
+
+Foreign Keys:
+player_id
+game_id
+(and maybe team_id)
+
+Unique constraint:
+(player_id, game_id)
+
+# April 21st 2026:
+
+1. Understand the API response shape
+2. Understand the app's needs
+3. Design a schema that works well for your app
+4. Transform the API data into that schema
+
+Transformation step is the important part
+
+Design your database around your app's needs
+While making sure the API can realistically provide the data required
+
+```
+The API gives me raw data in its own structure
+My databse does not need to copy that structure exactly
+I should design my schema around what my app needs
+as long as the API gives me enough information to transform the data into that schema
+```

@@ -72,4 +72,9 @@ public class PlayerService {
         // fetch all season stat rows for the requested player
         return playerSeasonStatRepository.findByPlayerId(playerId);
     }
+
+    /*
+    Method that gets game stats for one player
+     */
+    public List
 }

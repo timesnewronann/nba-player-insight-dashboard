@@ -58,4 +58,10 @@ public class PlayerController {
     public List<PlayerSeasonStat> getSeasonStatsByPlayerId(@PathVariable Long id) {
         return playerService.getSeasonStatsByPlayerId(id);
     }
+
+    // Request for player's games
+    @GetMapping("/{id}/games")
+    public List<PlayerGameStat>getPlayerGameStatsByPlayerId(@PathVariable Long id) {
+        return playerService;
+    }
 }
