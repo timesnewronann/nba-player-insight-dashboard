@@ -1156,3 +1156,45 @@ My databse does not need to copy that structure exactly
 I should design my schema around what my app needs
 as long as the API gives me enough information to transform the data into that schema
 ```
+
+Goal of the Script
+
+```
+1. Call nba_api to get player game log data
+2. For each API row, find the matching player in our players table
+3. For each API row, find the matching team in our teams table
+4. Create or update the corresponding game row in games
+5. Create or update the corresponding player game log row in player_game_logs
+```
+
+## Key Learning Idea before coding
+
+Script needs to Translate
+
+### External NBA ids
+
+from the API:
+
+- nba_player_id
+- nba_team_id
+- nba_game_id
+
+Into the app's
+
+### Internal DB ids
+
+- players.id
+- teams.id
+- games.id
+
+The API gives us external NBA ids.
+Our databse tables relate to each other using internal databse ids.
+So we need a lookup to translate external ids into internal ids before inserting rows.
+A dictionary is a good choice because the lookup is fast and easy to reuse inside the loop.
+
+1. Read the NBA ids from the API row
+2. Translate nba_player_id into players.id
+3. Translate nba_team_id into teams.id
+4. Insert or update the game row first because player_game_logs depends on a valid game row existing
+5. Then get games.id because player_game_logs.game_id must reference the internal games.id
+6. Then insert or update player_game_logs because we now have all the internal foreign keys needed for that row
