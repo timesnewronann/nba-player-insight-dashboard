@@ -20,7 +20,7 @@ CREATE TABLE players (
     height VARCHAR(20),
     weight VARCHAR(20),
     active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMzP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE player_season_stats (
