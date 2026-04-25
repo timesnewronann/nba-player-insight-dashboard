@@ -1198,3 +1198,36 @@ A dictionary is a good choice because the lookup is fast and easy to reuse insid
 4. Insert or update the game row first because player_game_logs depends on a valid game row existing
 5. Then get games.id because player_game_logs.game_id must reference the internal games.id
 6. Then insert or update player_game_logs because we now have all the internal foreign keys needed for that row
+
+# April 24th 2026:
+
+The getter method name, return type, and field must all match.
+If the field is private Game game -> Getter: public Game getGame() returning game
+The pattern is always consistent
+
+A JPA Entity is a file that maps our database's columns and data tables to be able to be used in Java through getters and setters.
+The entity is Java's representation of our data table
+
+I need to mark the primary key with @id
+I need to provide my foreign key relationships liek @ManyToOne or @OneToOne
+I need to mark foreign keys with @JoinColumn -> maps a relationship field to a foreign key column
+@Column maps a regular field to a column
+
+I need to have my objects so that we can make sure of the entire Object's fields and methods
+
+The entity allows us to layout the framework of how are database is structure and create a foundation for Java to be able to use all of the columns
+
+## Sharpened version
+
+A JPA entity is a Java class that maps to a database table
+Each instance of the class represents one row
+We need four things:
+
+- @Entity to tell Spring this class maps to a table
+- @Table to specify which table
+- @Id to mark the primary key
+- @Column/JoinColumn for each field
+
+Regular columns use @Column
+Foreign key relationships use @ManyToOne and @JoinColumn
+So JPA fetches the whole related object instaed of just an id

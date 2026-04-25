@@ -1,6 +1,7 @@
 package com.timesnewronan.hoopiq_api.entity;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
 // Mark the class as a JPA entity (map to a database table)
@@ -17,7 +18,7 @@ public class PlayerGameStat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // A Player can have multiple seasons stat rows
+    // A Player can have multiple game stat rows
     @ManyToOne
 
     // player_id column connects to the players table
@@ -25,13 +26,18 @@ public class PlayerGameStat {
     @JoinColumn(name = "player_id", nullable = false)
     private Player player;
 
+    // One game has many player game logs
+    @ManyToOne
     // game_id column connects to the games table
-    @Column(name = "game_id", nullable = false)
-    private BigDecimal game_id;
+    @JoinColumn(name = "game_id", nullable = false)
+    private Game game;
 
+    // Many players on the same team, many game log rows pointing to the same team
+    // should only be on one team
+    @ManyToOne
     // team_id column connects to the teams table
-    @Column(name = "team_id", nullable = false)
-    private BigDecimal team_id;
+    @JoinColumn(name = "team_id", nullable = false)
+    private Team team;
 
     // points scored
     @Column(name = "pts_scored", nullable = false)
@@ -62,7 +68,7 @@ public class PlayerGameStat {
     private BigDecimal fieldGoalPct;
 
     // three_point_pct
-    @Column(name = "field_goal_pct")
+    @Column(name = "three_point_pct")
     private BigDecimal threePointPct;
 
     // free_throw_pct
@@ -98,23 +104,23 @@ public class PlayerGameStat {
     }
 
     // getter to get the game
-    public BigDecimal getGameId() {
-        return game_id;
+    public Game getGame() {
+        return game;
     }
 
     // setter to set the game
-    public void setGameId(BigDecimal game_id) {
-        this.game_id = game_id;
+    public void setGame(Game game) {
+        this.game = game;
     }
 
-    // getter to get the team_id
-    public BigDecimal getTeamId() {
-        return team_id;
+    // getter to get the team
+    public Team getTeam() {
+        return team;
     }
 
-    // setter to set the team_id
-    public void setTeamId(BigDecimal team_id) {
-        this.team_id = team_id;
+    // setter to set the team
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
     // getter to get the points scored
@@ -123,4 +129,107 @@ public class PlayerGameStat {
     }
 
     // setter to set the points scored
+    public void setPtsScored(Integer ptsScored) {
+        this.ptsScored = ptsScored;
+    }
+
+    // getter to get the assists
+    public Integer getAssists() {
+        return assists;
+    }
+
+    // setter to set the assists
+    public void setAssists(Integer assists) {
+        this.assists = assists;
+    }
+
+    // getter to get the rebounds
+    public Integer getRebounds() {
+        return rebounds;
+    }
+
+    // setter to set the rebounds
+    public void setRebounds(Integer rebounds) {
+        this.rebounds = rebounds;
+    }
+
+    // getter to get blocks
+    public Integer getBlocks() {
+        return blocks;
+    }
+
+    // setter to set the blocks
+    public void setBlocks(Integer blocks) {
+        this.blocks = blocks;
+    }
+
+    // getter to get steals
+    public Integer getSteals() {
+        return steals;
+    }
+
+    // setter to set steals
+    public void setSteals(Integer steals) {
+        this.steals = steals;
+    }
+
+    // getter to get minutes
+    public BigDecimal getMinutes() {
+        return minutes;
+    }
+
+    // setter to set minutes
+    public void setMinutes(BigDecimal minutes) {
+        this.minutes = minutes;
+    }
+
+    // getter to get field_goal_pct
+    public BigDecimal getFieldGoalPct() {
+        return fieldGoalPct;
+    }
+
+    // setter to set field_goal_pct
+    public void setFieldGoalPct(BigDecimal fieldGoalPct) {
+        this.fieldGoalPct = fieldGoalPct;
+    }
+
+    // getter to get the three_point_pct
+    public BigDecimal getThreePointPct() {
+        return threePointPct;
+    }
+
+    // setter to get three_point_pct
+    public void setThreePointPct(BigDecimal threePointPct) {
+        this.threePointPct = threePointPct;
+    }
+
+    // getter to get free_throw_pct
+    public BigDecimal getFreeThrowPct() {
+        return freeThrowPct;
+    }
+
+    // setter to set free_throw_pct
+    public void setFreeThrowPct(BigDecimal freeThrowPct) {
+        this.freeThrowPct = freeThrowPct;
+    }
+
+    // getter to get turnovers
+    public Integer getTurnovers() {
+        return turnovers;
+    }
+
+    // setter to set turnovers
+    public void setTurnovers(Integer turnovers) {
+        this.turnovers = turnovers;
+    }
+
+    // getter to get win loss
+    public Character getWinLoss() {
+        return winLoss;
+    }
+
+    // setter to set win loss
+    public void setWinLoss(Character winLoss) {
+        this.winLoss = winLoss;
+    }
 }
