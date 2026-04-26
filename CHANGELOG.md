@@ -16,6 +16,21 @@ Added
 
 Fixed
 
+## [1.0.6] - 04-26-2026
+
+## Added
+
+- games and player_games_logs tables to PostgreSQl
+- PlayerGameStat, Game, Team Entity files
+- PlayerGameStatRepository
+- GET /api/players/{id}/games endpoint
+
+### Changed
+
+- games table columns home_team_id, away_team_id,
+  home_team_score, away_team_score, game_date
+  made nullable temporarily pending full games ETL
+
 ## [1.0.5] - 04-13-2026
 
 ### Future Improvements
