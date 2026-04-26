@@ -1,7 +1,9 @@
 package com.timesnewronan.hoopiq_api.service;
 
 import com.timesnewronan.hoopiq_api.entity.Player;
+import com.timesnewronan.hoopiq_api.entity.PlayerGameStat;
 import com.timesnewronan.hoopiq_api.entity.PlayerSeasonStat;
+import com.timesnewronan.hoopiq_api.repository.PlayerGameStatRepository;
 import com.timesnewronan.hoopiq_api.repository.PlayerRepository;
 import com.timesnewronan.hoopiq_api.repository.PlayerSeasonStatRepository;
 import org.springframework.stereotype.Service;
@@ -15,12 +17,15 @@ public class PlayerService {
     // player data from the databse
     private final PlayerRepository playerRepository;
     private final PlayerSeasonStatRepository playerSeasonStatRepository;
+    private final PlayerGameStatRepository playerGameStatRepository;
 
     // Constructor injection is the preferred Spring style
     // Spring will automatically pass in the PlayerRepository
-    public PlayerService(PlayerRepository playerRepository, PlayerSeasonStatRepository playerSeasonStatRepository) {
+    public PlayerService(PlayerRepository playerRepository, PlayerSeasonStatRepository playerSeasonStatRepository,
+            PlayerGameStatRepository playerGameStatRepository) {
         this.playerRepository = playerRepository;
         this.playerSeasonStatRepository = playerSeasonStatRepository;
+        this.playerGameStatRepository = playerGameStatRepository;
     }
 
     // getAllPlayers method
@@ -74,7 +79,13 @@ public class PlayerService {
     }
 
     /*
-    Method that gets game stats for one player
+     * Method that gets game stats for one player
      */
-    public List
+    public List<PlayerGameStat> getPlayerGameStatsByPlayerId(Long playerId) {
+        // verify that the player exists
+        getPlayerById(playerId);
+
+        // fetch the game stats for that player
+        return playerGameStatRepository.findByPlayerId(playerId);
+    }
 }

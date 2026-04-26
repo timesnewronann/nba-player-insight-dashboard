@@ -1231,3 +1231,5 @@ We need four things:
 Regular columns use @Column
 Foreign key relationships use @ManyToOne and @JoinColumn
 So JPA fetches the whole related object instaed of just an id
+
+Repository only deals with each specific object. Jpa handles the joins internally

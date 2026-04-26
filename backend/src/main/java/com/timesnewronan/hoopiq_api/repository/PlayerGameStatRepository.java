@@ -10,6 +10,6 @@ import java.util.List;
 public interface PlayerGameStatRepository extends JpaRepository<PlayerGameStat, Long> {
     // Interface tells Spring Data JPA to find all game stat rows
     // Where the related player id matches the given value
-    List<PlayerGameStat> findByPlayerId(Long player_id);
+    List<PlayerGameStat> findByPlayerId(Long playerId);
 
 }
