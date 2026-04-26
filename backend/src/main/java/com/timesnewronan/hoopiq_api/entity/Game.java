@@ -16,7 +16,7 @@ public class Game {
     // Mark the id field as the primary key
     @Id
 
-    // the databse generate the id automatically
+    // the database generate the id automatically
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
