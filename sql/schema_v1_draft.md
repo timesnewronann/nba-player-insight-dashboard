@@ -47,11 +47,11 @@
 
 - id (BIGSERIAL, primary key)
 - nba_game_id (INTEGER, not null)
-- home_team_id (BIGINT, foreign key -> teams.id, not null)
-- away_team_id (BIGINT, foreign key -> teams.id, not null)
-- home_team_score (INTEGER, not null)
-- away_team_score (INTEGER, not null)
-- game_date (DATE, not null)
+- home_team_id (BIGINT, foreign key -> teams.id, nullable)
+- away_team_id (BIGINT, foreign key -> teams.id, nullable)
+- home_team_score (INTEGER, nullable)
+- away_team_score (INTEGER, nullable)
+- game_date (DATE, nullable)
 - season (VARCHAR(20), not null)
 - created_at (TIMESTAMP, default current timestamp)
 

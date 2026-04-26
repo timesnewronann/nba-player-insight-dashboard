@@ -1233,3 +1233,68 @@ Foreign key relationships use @ManyToOne and @JoinColumn
 So JPA fetches the whole related object instaed of just an id
 
 Repository only deals with each specific object. Jpa handles the joins internally
+
+# April 26th 2026:
+
+I built:
+
+- PlayerGameStat.java
+- Game.java
+- Team.java
+- PlayerGameStatRepository.java
+- PlayerService.java
+- PlayerController.java
+
+"What are the four files I need to create to add a new endpoint in Spring Boot, and what does each one do"
+
+1. I need to have a SQL file with an existing data table which I can grab data from
+2. I need to have an entity file which maps the database data table to Java
+3. I need a repository file to help us fetch the data from the database
+4. I need a service file which has the method that the endpoint is trying to accomplish
+5. I need a controller which calls the call method on the backend
+
+## Refined Version
+
+# How to add a new endpoint in Spring Boot
+
+1. SQL Table: the actual data structure in PostgreSQL that everything maps to
+2. Entity: The java class that represents one row from that table, with fields for each column
+3. Repository: the interface that talks to the databse, Spring generates the SQL automatically from method names
+4. Service: holds the business logic, decides what to do with the data before returning it
+5. Controller: handles the HTTP request, calls the service, returns the response as JSON
+
+"Why do we need to to insert the game row before the player_game_log row?"
+Because the player_game_logs game_id column references games id so we need to insert the parent row before the child row can reference it.
+
+## Referential Integrity
+
+The database enforces that a child row cannot reference a parent that doesn't exist yet.
+
+"Build Team Lookup dictionary, nba_team_id -> teams.id"
+Why do you need a team lookup?
+What are you going to use for it when you insert rows
+
+player_game_logs has a team_id column we want to be able to quickly translate the nba_team_id into our internal data's column of team_id.
+
+flow for each API row:
+read nba_game_id from API row
+-> insert that game into games table (or skip if it already exists)
+-> ask the database "what is the internal id for that nba_game_id?"
+-> Use that internal id when inserting into player_game_logs
+
+The player lookup and team lookup need to be built before we start looping through the API row.
+
+Because for every single row in the loop we need to translate the external IDs to the internal IDs instantly
+
+Building the dictionary once upfront is much more efficent than going through the database every time
+
+1. Build player lookup dictionary
+2. Build team lookup dictionary
+3. Fetch game log rows from the API
+4. Loop through each row - inside the loop you insert games and player_game_logs
+
+Games don't need a lookup dictionary because you create them inside the loop and immediately fetch back the id that was just generated.
+
+We query our own database for active players and build a dictionary translating nba_player_id to our internal db_player_id.
+Then the outer loop goes through each active player, calls the NBA API to get that specific player's game log for that season and converts the response into a dataframe so we can loop through each game row in the inner loop
+

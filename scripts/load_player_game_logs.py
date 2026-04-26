@@ -1,15 +1,14 @@
-# Import our necessary libraries
 from os import getenv
 from pathlib import Path
 
-# player game logs endpoint -> returns an individual player's many game logs
-from nba_api.stats.endpoints import leaguedashplayerstats
-
-# PostgreSQL driver for Python
-import psycopg2
-
-# 1. Load environment variables from .env
+# Load variables from .env file
 from dotenv import load_dotenv
+
+# player game log stats endpoint -> returns player game log columns in one request
+from nba_api.stats.endpoints import playergamelog
+
+# PosstgreSQL driver for Python
+import psycopg2
 
 # -------------------------
 # STEP 0: LOAD ENVIRONMENT VARIABLES
@@ -17,33 +16,146 @@ from dotenv import load_dotenv
 
 # Load values from .env so we can read DB credentials safely
 env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(dotenv_path=env_path, override=True)
 
-# 2. Connect to the Postgres database
+# Read the database configurations from our env file
+db_host = getenv("DB_HOST")
+db_port = getenv("DB_PORT", "5432")  # if DB PORT isn't set use 5432
+db_name = getenv("DB_NAME")
+db_user = getenv("DB_USER")
+db_password = getenv("DB_PASSWORD")
 
-# 3. Build Player Lookup dictionary
-#   nba_player_id -> players.id
+print(f"Using env file: {env_path}")
+print(f"db_host: {db_host}")
+print(f"db_user: {db_user}")
 
-# 4. Build Team Lookup dictionary
-#   nba_team_id -> teams.id
+# Fail early if required environment variables are missing
+if not db_host or not db_name or not db_user or not db_password:
+    raise ValueError("Missing one or more required database environment variables.")
 
-# 5. Select the season we want to load (2024-25)
+# -------------------------
+# STEP 1: CHOOSE THE SEASON WE WANT TO LOAD
+# -------------------------
+# Use 2024-25 season
+season_to_load = "2024-25"
 
-# 6. Fetch game log rows from nba_api
+# -------------------------
+# STEP 2: PREP VARIABLES
+# -------------------------
 
-# 7. For each API row:
-#   - read nba_player_id
-#   - read nba_team_id
-#   - read nba_game_id
-#   - translate nba_player_id into our internal players.id to match the database
-#   - translate nba_team_id into our internal teams.id to match the database
-#   - skip row if player or team are missing locally
-#   - insert or update the game row in games
-#   - get the internal games.id for that nba_game_id
-#   - insert or update the player_game_logs row using internal ids
+# Initialize connection and cursor to None
+connection = None
+cursor = None
 
+# Initialize counters
+inserted_or_updated_count = 0
+skipped_count = 0
 
-# 8. Commit changes
+# Open try block
+try:
+    # -------------------------
+    # STEP 3: CONNECT TO POSTGRES
+    # -------------------------
+    connection = psycopg2.connect(
+        host=db_host,
+        port=db_port,
+        dbname=db_name,
+        user=db_user,
+        password=db_password,
+    )
 
-# 9. If something fails, rollback transition
+    # Create the cursor
+    cursor = connection.cursor()
 
-# 10 Always close cursor and connection
+    # -------------------------
+    # STEP 4: BUILD PLAYER ID LOOKUP DICTIONARY
+    # -------------------------
+
+    # Translate nba_player_id into our databse's internal player_id
+    cursor.execute(
+        """
+        SELECT id, nba_player_id
+        FROM players
+        WHERE active = TRUE
+        """
+    )
+
+    # get all the rows
+    active_players_rows = cursor.fetchall()
+
+    # use a dictionary to provide fast lookup
+    nba_player_id_to_db_player_id = {}
+
+    # build the dictionary
+    for db_player_id, nba_player_id in active_players_rows:
+        # translate the player id key to player_id
+        nba_player_id_to_db_player_id[nba_player_id] = db_player_id
+
+    # Print statement that we were able to successfully map the ids
+    print(f"Loaded {len(nba_player_id_to_db_player_id)} player id mappings from the databse")
+
+    # -------------------------
+    # STEP 4.5: BUILD TEAMS ID LOOKUP DICTIONARY
+    # -------------------------
+
+    cursor.execute(
+        """
+        SELECT id, nba_team_id
+        FROM teams
+        """
+    )
+
+    # grab all the rows
+    team_lookup_rows = cursor.fetchall()
+
+    # Use a dictionary to provide fast lookup
+    nba_team_id_to_db_team_id = {}
+
+    # build the dictioanry
+    for db_team_id, nba_team_id in team_lookup_rows:
+        # translate the team id key to team_id
+        nba_team_id_to_db_team_id[nba_team_id] = db_team_id
+
+    # Print statement that we were able to successfully map the ids
+    print(f"Loaded {len(nba_team_id_to_db_team_id)} team id mappings from the database")
+
+    # -------------------------
+    # STEP 5: FETCH SEASON STATS FROM NBA API
+    # -------------------------
+    for nba_player_id, db_player_id in nba_player_id_to_db_player_id.items():
+        # fetch game logs from API for this player
+        # loop through each game log row and insert
+        game_log_response = playergamelog.PlayerGameLog(
+            player_id=nba_player_id,
+            season=season_to_load
+        )
+
+        # convert into a dataframe
+        game_log_df = game_log_response.get_data_frames()[0]
+        for _, row in game_log_df.iterrows():
+            # read nba_team_id and nba_game_id from the row
+            nba_team_id = row["TEAM_ID"]
+            nba_game_id = row["GAME_ID"]
+
+            # translate team id or skip if not found
+            if nba_team_id not in nba_team_id_to_db_team_id:
+                skipped_count += 1
+                continue
+
+            # insert into games table
+            cursor.execute(
+                """
+                INSERT INTO games (
+                    nba_game_id,
+                    season
+                )
+                VALUES(%s, %s)
+                ON CONFLICT (nba_game_id) DO NOTHING
+                """,
+                (
+                    nba_game_id,
+                    season_to_load
+                )
+            )
+            # get internal game id
+            # insert into player_game_logs
