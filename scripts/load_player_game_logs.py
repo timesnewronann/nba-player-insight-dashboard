@@ -97,27 +97,23 @@ try:
     # -------------------------
     # STEP 4.5: BUILD TEAMS ID LOOKUP DICTIONARY
     # -------------------------
-
     cursor.execute(
         """
-        SELECT id, nba_team_id
-        FROM teams
+        SELECT id, abbreviation FROM teams
         """
     )
 
     # grab all the rows
-    team_lookup_rows = cursor.fetchall()
+    team_abbrev_rows = cursor.fetchall()
 
-    # Use a dictionary to provide fast lookup
-    nba_team_id_to_db_team_id = {}
+    # dictionary for fast lookup
+    abbreviation_to_db_team_id = {}
 
-    # build the dictionary
-    for db_team_id, nba_team_id in team_lookup_rows:
-        # translate the team id key to team_id
-        nba_team_id_to_db_team_id[nba_team_id] = db_team_id
+    for db_team_id, abbreviation in team_abbrev_rows:
+        abbreviation_to_db_team_id[abbreviation] = db_team_id
 
     # Print statement that we were able to successfully map the ids
-    print(f"Loaded {len(nba_team_id_to_db_team_id)} team id mappings from the database")
+    print(f"Loaded {len(abbreviation_to_db_team_id)} team id mappings from the database")
 
     # -------------------------
     # STEP 5: FETCH SEASON STATS FROM NBA API
@@ -134,13 +130,16 @@ try:
         game_log_df = game_log_response.get_data_frames()[0]
         for _, row in game_log_df.iterrows():
             # read nba_team_id and nba_game_id from the row
-            nba_team_id = row["TEAM_ID"]
-            nba_game_id = row["GAME_ID"]
+            nba_game_id = row["Game_ID"]
 
-            # translate team id or skip if not found
-            if nba_team_id not in nba_team_id_to_db_team_id:
+            team_abbreviation = row["MATCHUP"][0:3]
+
+            # translate team abbreviation or skip if not found
+            if team_abbreviation not in abbreviation_to_db_team_id:
                 skipped_count += 1
                 continue
+
+            db_team_id = abbreviation_to_db_team_id[team_abbreviation]
 
             # insert into games table
             cursor.execute(
