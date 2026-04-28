@@ -1075,3 +1075,234 @@ Test the API:
 - The script first builds a lookup dictionary from players.nba_player_id to players.id so we can map external NBA player IDs to our internal database IDs efficiently.
 - Then it transforms the API response into our database schema and inserts the rows into player_season_stats using ON CONFLICT so the script is safe to rerun
 
+# feature/player-game-logs-endpoint
+
+1. Design the new tables
+2. Write the ingestion script
+3. Load the data
+4. Verify the SQL rows look correct
+5. Build the Spring endpoint
+
+We can use two data tables
+
+- games -> the game played
+- player_game_logs -> an individual player's performance for a game
+
+```
+A game exists on its own
+A player game log is a player's stat line for the one game
+Many players can belong to a single game M -> 1
+One player can have many game logs across many games 1 -> M
+
+teams <- games
+teams <- players
+players <- player game logs -> games
+```
+
+## games should not have player_id as its foreign key
+
+Because a game exists even before we focus on any single player
+
+- Lakers vs Warrios
+- On a certain date
+- On a certain season
+- with a certain NBA game id
+
+one game --> many player_game_logs
+one player --> many player_game logs
+
+## Games:
+
+One row = one nba game
+Primary Key:
+id
+
+Unique NBA field:
+nba_game_id
+
+Foreign Keys:
+home_team_id
+away_team_id
+
+Player_game_logs
+One row = one player's stat line in one NBA game
+
+Primary key:
+id
+
+Foreign Keys:
+player_id
+game_id
+(and maybe team_id)
+
+Unique constraint:
+(player_id, game_id)
+
+# April 21st 2026:
+
+1. Understand the API response shape
+2. Understand the app's needs
+3. Design a schema that works well for your app
+4. Transform the API data into that schema
+
+Transformation step is the important part
+
+Design your database around your app's needs
+While making sure the API can realistically provide the data required
+
+```
+The API gives me raw data in its own structure
+My databse does not need to copy that structure exactly
+I should design my schema around what my app needs
+as long as the API gives me enough information to transform the data into that schema
+```
+
+Goal of the Script
+
+```
+1. Call nba_api to get player game log data
+2. For each API row, find the matching player in our players table
+3. For each API row, find the matching team in our teams table
+4. Create or update the corresponding game row in games
+5. Create or update the corresponding player game log row in player_game_logs
+```
+
+## Key Learning Idea before coding
+
+Script needs to Translate
+
+### External NBA ids
+
+from the API:
+
+- nba_player_id
+- nba_team_id
+- nba_game_id
+
+Into the app's
+
+### Internal DB ids
+
+- players.id
+- teams.id
+- games.id
+
+The API gives us external NBA ids.
+Our databse tables relate to each other using internal databse ids.
+So we need a lookup to translate external ids into internal ids before inserting rows.
+A dictionary is a good choice because the lookup is fast and easy to reuse inside the loop.
+
+1. Read the NBA ids from the API row
+2. Translate nba_player_id into players.id
+3. Translate nba_team_id into teams.id
+4. Insert or update the game row first because player_game_logs depends on a valid game row existing
+5. Then get games.id because player_game_logs.game_id must reference the internal games.id
+6. Then insert or update player_game_logs because we now have all the internal foreign keys needed for that row
+
+# April 24th 2026:
+
+The getter method name, return type, and field must all match.
+If the field is private Game game -> Getter: public Game getGame() returning game
+The pattern is always consistent
+
+A JPA Entity is a file that maps our database's columns and data tables to be able to be used in Java through getters and setters.
+The entity is Java's representation of our data table
+
+I need to mark the primary key with @id
+I need to provide my foreign key relationships liek @ManyToOne or @OneToOne
+I need to mark foreign keys with @JoinColumn -> maps a relationship field to a foreign key column
+@Column maps a regular field to a column
+
+I need to have my objects so that we can make sure of the entire Object's fields and methods
+
+The entity allows us to layout the framework of how are database is structure and create a foundation for Java to be able to use all of the columns
+
+## Sharpened version
+
+A JPA entity is a Java class that maps to a database table
+Each instance of the class represents one row
+We need four things:
+
+- @Entity to tell Spring this class maps to a table
+- @Table to specify which table
+- @Id to mark the primary key
+- @Column/JoinColumn for each field
+
+Regular columns use @Column
+Foreign key relationships use @ManyToOne and @JoinColumn
+So JPA fetches the whole related object instaed of just an id
+
+Repository only deals with each specific object. Jpa handles the joins internally
+
+# April 26th 2026:
+
+I built:
+
+- PlayerGameStat.java
+- Game.java
+- Team.java
+- PlayerGameStatRepository.java
+- PlayerService.java
+- PlayerController.java
+
+"What are the four files I need to create to add a new endpoint in Spring Boot, and what does each one do"
+
+1. I need to have a SQL file with an existing data table which I can grab data from
+2. I need to have an entity file which maps the database data table to Java
+3. I need a repository file to help us fetch the data from the database
+4. I need a service file which has the method that the endpoint is trying to accomplish
+5. I need a controller which calls the call method on the backend
+
+## Refined Version
+
+# How to add a new endpoint in Spring Boot
+
+1. SQL Table: the actual data structure in PostgreSQL that everything maps to
+2. Entity: The java class that represents one row from that table, with fields for each column
+3. Repository: the interface that talks to the databse, Spring generates the SQL automatically from method names
+4. Service: holds the business logic, decides what to do with the data before returning it
+5. Controller: handles the HTTP request, calls the service, returns the response as JSON
+
+"Why do we need to to insert the game row before the player_game_log row?"
+Because the player_game_logs game_id column references games id so we need to insert the parent row before the child row can reference it.
+
+## Referential Integrity
+
+The database enforces that a child row cannot reference a parent that doesn't exist yet.
+
+"Build Team Lookup dictionary, nba_team_id -> teams.id"
+Why do you need a team lookup?
+What are you going to use for it when you insert rows
+
+player_game_logs has a team_id column we want to be able to quickly translate the nba_team_id into our internal data's column of team_id.
+
+flow for each API row:
+read nba_game_id from API row
+-> insert that game into games table (or skip if it already exists)
+-> ask the database "what is the internal id for that nba_game_id?"
+-> Use that internal id when inserting into player_game_logs
+
+The player lookup and team lookup need to be built before we start looping through the API row.
+
+Because for every single row in the loop we need to translate the external IDs to the internal IDs instantly
+
+Building the dictionary once upfront is much more efficent than going through the database every time
+
+1. Build player lookup dictionary
+2. Build team lookup dictionary
+3. Fetch game log rows from the API
+4. Loop through each row - inside the loop you insert games and player_game_logs
+
+Games don't need a lookup dictionary because you create them inside the loop and immediately fetch back the id that was just generated.
+
+We query our own database for active players and build a dictionary translating nba_player_id to our internal db_player_id.
+Then the outer loop goes through each active player, calls the NBA API to get that specific player's game log for that season and converts the response into a dataframe so we can loop through each game row in the inner loop
+
+## What is the difference between a JOIN and a LEFT JOIN, and when would I use one?
+
+- A JOIN: is an inner join and it is strict it only returns rows where both sides have matching value
+  "Give me gmaes that have a matching team row" If home_team_id is NULL, there's no match - that game row gets thrown out entirely
+
+- A LEFT JOIN: "give meall games and if there's a matching team row incude it, but if there isn't that's fine, just return NULL for those team columns."
+
+

@@ -16,6 +16,41 @@ Added
 
 Fixed
 
+## [1.0.7] - 04-27-2026
+
+## Added
+
+- PlayerGameStat.java entity mapping to player_game_logs table
+- Game.java entity mapping to games table
+- Team.java entity mapping to teams table
+- PlayerGameStatRepository.java for database access
+- Finished GET/api/player/{id}/games endpoint
+- load_player_game_logs.py ETL script to ingest 2024-25 player game logs
+- 1,230 games rows loaded into games table
+
+### Changed
+
+- Game.java home/away team relationships to optional = true and nullable = true to support left join behavior for nullable team columns
+- PlayerService.java constructor updated to inject PlayerGameStatRepository
+- PlayerController.java fixed broken getPlayerGameStatsByPlayerId method
+- Team lookup dictionary in ETL script to use abbreviation instead of nba_team_id
+- Added retry logic and time.sleep(1) delay to handle NBA API rate limiting
+
+## [1.0.6] - 04-26-2026
+
+## Added
+
+- games and player_games_logs tables to PostgreSQl
+- PlayerGameStat, Game, Team Entity files
+- PlayerGameStatRepository
+- GET /api/players/{id}/games endpoint
+
+### Changed
+
+- games table columns home_team_id, away_team_id,
+  home_team_score, away_team_score, game_date
+  made nullable temporarily pending full games ETL
+
 ## [1.0.5] - 04-13-2026
 
 ### Future Improvements
