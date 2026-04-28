@@ -1298,3 +1298,11 @@ Games don't need a lookup dictionary because you create them inside the loop and
 We query our own database for active players and build a dictionary translating nba_player_id to our internal db_player_id.
 Then the outer loop goes through each active player, calls the NBA API to get that specific player's game log for that season and converts the response into a dataframe so we can loop through each game row in the inner loop
 
+## What is the difference between a JOIN and a LEFT JOIN, and when would I use one?
+
+- A JOIN: is an inner join and it is strict it only returns rows where both sides have matching value
+  "Give me gmaes that have a matching team row" If home_team_id is NULL, there's no match - that game row gets thrown out entirely
+
+- A LEFT JOIN: "give meall games and if there's a matching team row incude it, but if there isn't that's fine, just return NULL for those team columns."
+
+

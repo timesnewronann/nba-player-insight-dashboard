@@ -23,26 +23,26 @@ public class Game {
     @Column(name = "nba_game_id", nullable = false)
     private Integer nbaGameId;
 
-    @ManyToOne
+    @ManyToOne(optional = true)
     // home team id
-    @JoinColumn(name = "home_team_id", nullable = false)
+    @JoinColumn(name = "home_team_id", nullable = true)
     private Team homeTeam;
 
-    @ManyToOne
+    @ManyToOne(optional = true)
     // away team id
-    @JoinColumn(name = "away_team_id", nullable = false)
+    @JoinColumn(name = "away_team_id", nullable = true)
     private Team awayTeam;
 
     // home team score
-    @Column(name = "home_team_score", nullable = false)
+    @Column(name = "home_team_score", nullable = true)
     private Integer homeTeamScore;
 
     // away team score
-    @Column(name = "away_team_score", nullable = false)
+    @Column(name = "away_team_score", nullable = true)
     private Integer awayTeamScore;
 
     // game date
-    @Column(name = "game_date", nullable = false)
+    @Column(name = "game_date", nullable = true)
     private LocalDate gameDate;
 
     // season
