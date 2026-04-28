@@ -111,7 +111,7 @@ try:
     # Use a dictionary to provide fast lookup
     nba_team_id_to_db_team_id = {}
 
-    # build the dictioanry
+    # build the dictionary
     for db_team_id, nba_team_id in team_lookup_rows:
         # translate the team id key to team_id
         nba_team_id_to_db_team_id[nba_team_id] = db_team_id
@@ -150,12 +150,107 @@ try:
                     season
                 )
                 VALUES(%s, %s)
-                ON CONFLICT (nba_game_id) DO NOTHING
+                ON CONFLICT (nba_game_id) 
+                DO NOTHING
                 """,
                 (
                     nba_game_id,
-                    season_to_load
+                    season_to_load,
+
                 )
             )
+
             # get internal game id
+            cursor.execute(
+                """
+                SELECT id FROM games WHERE nba_game_id = %s
+                """,
+                (
+                    nba_game_id,
+                )
+            )
+
+            # grab the id
+            game_row = cursor.fetchone()
+            db_game_id = game_row[0]
+
             # insert into player_game_logs
+            cursor.execute(
+                """
+            INSERT INTO player_game_logs(
+                player_id,
+                game_id,
+                team_id,
+                pts_scored,
+                assists,
+                rebounds,
+                blocks,
+                steals,
+                minutes,
+                field_goal_pct,
+                three_point_pct,
+                free_throw_pct,
+                turnovers,
+                win_loss
+            )
+            VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (player_id, game_id)
+            DO UPDATE SET
+                    pts_scored = EXCLUDED.pts_scored,
+                    assists = EXCLUDED.assists,
+                    rebounds = EXCLUDED.rebounds,
+                    blocks = EXCLUDED.blocks,
+                    steals = EXCLUDED.steals,
+                    minutes = EXCLUDED.minutes,
+                    field_goal_pct = EXCLUDED.field_goal_pct,
+                    three_point_pct = EXCLUDED.three_point_pct,
+                    free_throw_pct = EXCLUDED.free_throw_pct,
+                    turnovers = EXCLUDED.turnovers,
+                    win_loss = EXCLUDED.win_loss
+            """,
+                (
+                    db_player_id,
+                    db_game_id,
+                    db_team_id,
+                    row["PTS"],
+                    row["AST"],
+                    row["REB"],
+                    row["BLK"],
+                    row["STL"],
+                    row["MIN"],
+                    row["FG_PCT"],
+                    row["FG3_PCT"],
+                    row["FT_PCT"],
+                    row["TOV"],
+                    row["WL"]
+                )
+            )
+
+            inserted_or_updated_count += 1
+
+    # -------------------------
+    # STEP 7: COMMIT CHANGES
+    # -------------------------
+    connection.commit()
+
+    print(f"Inserted or updated {inserted_or_updated_count} player season stat rows.")
+    print(f"Skipped {skipped_count} rows because no matching player was found in the local database.")
+
+
+except Exception as error:
+    # Roll back the current transaction if something fails
+    if connection is not None:
+        connection.rollback()
+
+    # Show the error so we know what went wrong
+    print(f"Season stats ETL script failed: {error}")
+    raise
+
+finally:
+    # Always close the cursor if it was created
+    if cursor is not None:
+        cursor.close()
+
+    # Always close the connection if it was created
+    if connection is not None:
+        connection.close()
