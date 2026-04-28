@@ -10,6 +10,9 @@ from nba_api.stats.endpoints import playergamelog
 # PosstgreSQL driver for Python
 import psycopg2
 
+# Add delay between api calls to not destroy the server
+import time
+
 # -------------------------
 # STEP 0: LOAD ENVIRONMENT VARIABLES
 # -------------------------
@@ -92,7 +95,7 @@ try:
         nba_player_id_to_db_player_id[nba_player_id] = db_player_id
 
     # Print statement that we were able to successfully map the ids
-    print(f"Loaded {len(nba_player_id_to_db_player_id)} player id mappings from the databse")
+    print(f"Loaded {len(nba_player_id_to_db_player_id)} player id mappings from the database")
 
     # -------------------------
     # STEP 4.5: BUILD TEAMS ID LOOKUP DICTIONARY
@@ -121,10 +124,18 @@ try:
     for nba_player_id, db_player_id in nba_player_id_to_db_player_id.items():
         # fetch game logs from API for this player
         # loop through each game log row and insert
-        game_log_response = playergamelog.PlayerGameLog(
-            player_id=nba_player_id,
-            season=season_to_load
-        )
+        # Wrapped api call in a try except so we don't timeout on every player
+        # We will get some players skipped though
+        try:
+            game_log_response = playergamelog.PlayerGameLog(
+                player_id=nba_player_id,
+                season=season_to_load
+            )
+
+            time.sleep(1)
+        except Exception as e:
+            print(f"Skipping player {nba_player_id} due to error: {e}")
+            continue
 
         # convert into a dataframe
         game_log_df = game_log_response.get_data_frames()[0]
