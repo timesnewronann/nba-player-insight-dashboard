@@ -6,7 +6,10 @@ import com.timesnewronan.hoopiq_api.entity.PlayerSeasonStat;
 import com.timesnewronan.hoopiq_api.repository.PlayerGameStatRepository;
 import com.timesnewronan.hoopiq_api.repository.PlayerRepository;
 import com.timesnewronan.hoopiq_api.repository.PlayerSeasonStatRepository;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
@@ -62,7 +65,8 @@ public class PlayerService {
         // findById returns an Optional<Player>
         // If the player exists, return it
         // If not, throw an exception with a clear message
-        return playerRepository.findById(id).orElseThrow(() -> new RuntimeException("Player not found with id: " + id));
+        return playerRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found with id" + id));
     }
 
     /*
