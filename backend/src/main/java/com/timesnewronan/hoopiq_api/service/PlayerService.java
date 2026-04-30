@@ -66,7 +66,7 @@ public class PlayerService {
         // If the player exists, return it
         // If not, throw an exception with a clear message
         return playerRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found with id" + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found with id " + id));
     }
 
     /*

@@ -51,6 +51,11 @@ public class Player {
         return id;
     }
 
+    // Setter for id - used in unit tests only
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Integer getNbaPlayerId() {
         return nbaPlayerId;
     }
