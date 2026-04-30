@@ -1305,4 +1305,14 @@ Then the outer loop goes through each active player, calls the NBA API to get th
 
 - A LEFT JOIN: "give meall games and if there's a matching team row incude it, but if there isn't that's fine, just return NULL for those team columns."
 
+# April 28th 2026
+
+- Use ResponseStatusException in Spring service layers instead of RuntimeException so the API returns meaningful HTTP status codes like 404 not found to the client instead of a generic 500 Internal Server Error
+
+# April 29th 2026
+Unit tests with Mockito run in ~1 second because they don't need to load the database or Spring context
+
+Ingeration tests with @SpringBootTest take ~9 seconds because they start the whole application
+
+Fast Tests get run more often
 
