@@ -1310,9 +1310,54 @@ Then the outer loop goes through each active player, calls the NBA API to get th
 - Use ResponseStatusException in Spring service layers instead of RuntimeException so the API returns meaningful HTTP status codes like 404 not found to the client instead of a generic 500 Internal Server Error
 
 # April 29th 2026
+
 Unit tests with Mockito run in ~1 second because they don't need to load the database or Spring context
 
 Ingeration tests with @SpringBootTest take ~9 seconds because they start the whole application
 
 Fast Tests get run more often
 
+CORS = Cross-Origin Resource Sharing
+
+- The Browser is protective
+- When React app at localhost:5173 tries to fetch data from localhost:8080, the browser says "wait - these are two different origins, different ports. I'm not going to allow this unless the server explicitly says it's okay."
+
+Example:
+Bouncer at a club
+The frontend is a guest trying to get in.
+The backend is the club
+CORS is the bouncer
+By default he says no to everyone from a different address.
+You have to tell the bouncer "hey, let people from localhost:5173 in."
+
+You fix it in your Spring Boot backend by adding a CORS configuration that says "requests from localhost:5173 are allowed."
+
+# May 1st 2026
+
+States are any data that can change overtime and when it changes React re-renders the component to reflect the new value
+
+EX:
+When a user types in a search box, the text they type is the state
+
+When results come back from the API the results are the state
+
+When a player is seelected the player is the state
+
+A Prop is an attribute you pass to a JSX element
+`<intput type="text" placeholder="Search any NBA player..."/>`
+
+# Only event handler props need functions because they're responding to something happening.
+
+Anything that starts with on is an event handler:
+
+- onChange
+- onClick
+- onSubmit
+- onFocus
+
+# Regular Props just take values
+
+- value={searchQuery}
+- type="text"
+- placeholder="..."
+- disabled={true}

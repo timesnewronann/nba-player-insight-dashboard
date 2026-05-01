@@ -35,6 +35,7 @@ htmlcov/
 # OS / editor files
 # ------------------------------
 .DS_Store
+**/.DS_Store
 Thumbs.db
 .vscode/
 .idea/
@@ -81,8 +82,14 @@ dist/
 build/
 coverage/
 
+# Vite
+frontend/dist/
+frontend/.vite/
+*.local
+
 # ------------------------------
 # Misc
 # ------------------------------
 *.tmp
 *.swp
+
