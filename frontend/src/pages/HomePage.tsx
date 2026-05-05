@@ -1,7 +1,14 @@
 import { useState } from "react"
+import type { Player } from "../types/Player"
+import searchPlayers from  "../services/PlayerService"
 
 function HomePage() {
     const [searchQuery, setSearchQuery] = useState('')
+    const [players, setPlayers] = useState<Player[]>([])
+    const handleSearch = async () => {
+        // call searchPlayers with searchQuery
+        // update players state with the results
+    }
     return (
         <div className="HomePage">
             <h1>READ THE FLOOR</h1>
@@ -11,7 +18,6 @@ function HomePage() {
             value={searchQuery}
             onChange={(e) =>setSearchQuery(e.target.value)}
             />
-            <p>You typed: {searchQuery}</p>
             <p>Shot charts. Game logs. Season Stats. Every player, Every Game. All in One Place</p>
             <h2>Player Season Stats</h2>
             <h2>Player Shot Chart</h2>

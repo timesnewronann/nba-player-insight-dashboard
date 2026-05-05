@@ -1361,3 +1361,24 @@ Anything that starts with on is an event handler:
 - type="text"
 - placeholder="..."
 - disabled={true}
+
+The playerService.ts file makes an HTTP request to our playerService.java SpringBoot endpoint at
+http://localhost:8080/api/players/search?query=...
+
+Java code runs our backend server
+The React code runs in our browser
+These two communicate over HTTP not directly
+
+playerService.ts function needs:
+
+1. Takes a search query string as a paremeter
+2. Makes a GET request to http://localhost:8080/api/players/search?query=...
+3. Returns the player result
+
+## Promise: I don't have this value yet but I will soon.
+
+JavaScript doesn't stop it keeps running
+"Horses don't stop they keep going"
+Promise is representing the future value that will arrive
+
+Example: Waiter gives you a ticket for food at the restaurant promising that you'll get your order.
