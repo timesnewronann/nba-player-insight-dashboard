@@ -7,8 +7,12 @@ function HomePage() {
     const [players, setPlayers] = useState<Player[]>([])
     const handleSearch = async () => {
         // call searchPlayers with searchQuery
+        const searchResult = await searchPlayers(searchQuery)
         // update players state with the results
+        setPlayers(searchResult)
     }
+    
+
     return (
         <div className="HomePage">
             <h1>READ THE FLOOR</h1>
@@ -16,8 +20,15 @@ function HomePage() {
             <input type="text" 
             placeholder="Search any NBA player..."
             value={searchQuery}
-            onChange={(e) =>setSearchQuery(e.target.value)}
+            onChange={(e) => {
+                setSearchQuery(e.target.value)
+                handleSearch()
+            }}
             />
+            <button onClick={handleSearch}>Search</button>
+            {players.map((player) => (
+                <p key={player.id}>{player.fullName}</p>
+            ))}
             <p>Shot charts. Game logs. Season Stats. Every player, Every Game. All in One Place</p>
             <h2>Player Season Stats</h2>
             <h2>Player Shot Chart</h2>
