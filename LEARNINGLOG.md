@@ -1382,3 +1382,42 @@ JavaScript doesn't stop it keeps running
 Promise is representing the future value that will arrive
 
 Example: Waiter gives you a ticket for food at the restaurant promising that you'll get your order.
+
+# May 5th 2026
+
+To make search work today I created an event handler handleSearch which calls the searchPlayers function with the queried player
+It then update the player state with the result so the search is visible on the search bar
+We had an onChange event where we call the setSearchQuery function so that the searchQuery is set and then we call the handleSearch
+
+We then mapped the player after
+
+1. State: useState stores data that can change
+   searchQuery: what the user typed
+   players: the results from the API
+
+When the state updates, React automatically re-renders the component
+
+2. Event handlers: functions that run when something happens.
+   onChange fires on every keystroke and updates searchQuery
+   onClick on the button calls handleSearch
+   Events connect user actions to state changes
+
+3. Rendering lists: .map() loops through the players array and returns JSX for each item.
+   The key prop tells React how to track each item uniquely
+
+# May 7th 2026
+
+## Player Page Requirements
+
+1. Read the id from the URL
+2. Call Spring Boot API to get that player's details
+3. Display the player's name, stats, and game logs
+
+useParams is the React Router hook that reads URL parameters
+ex: {id: "2196"}
+
+Tasks:
+Add two things to PlayerPage.tsx:
+
+1. SeasonStat.ts - based on PlayerSeasonStat.java entity
+2. GameLog.ts - based on PlayerGameStat.java entity

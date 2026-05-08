@@ -1,6 +1,7 @@
 import { useState } from "react"
 import type { Player } from "../types/Player"
 import searchPlayers from  "../services/PlayerService"
+import { Link } from "react-router-dom"
 
 function HomePage() {
     const [searchQuery, setSearchQuery] = useState('')
@@ -27,7 +28,9 @@ function HomePage() {
             />
             <button onClick={handleSearch}>Search</button>
             {players.map((player) => (
-                <p key={player.id}>{player.fullName}</p>
+                <Link to={`/player/${player.id}`} key={player.id}>
+                    {player.fullName}
+                </Link>
             ))}
             <p>Shot charts. Game logs. Season Stats. Every player, Every Game. All in One Place</p>
             <h2>Player Season Stats</h2>
