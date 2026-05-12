@@ -1,7 +1,7 @@
 import { useState } from "react"
 import type { Player } from "../types/Player"
-import searchPlayers from  "../services/PlayerService"
 import { Link } from "react-router-dom"
+import { searchPlayers } from "../services/PlayerService"
 
 function HomePage() {
     const [searchQuery, setSearchQuery] = useState('')

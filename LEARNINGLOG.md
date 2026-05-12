@@ -1435,3 +1435,13 @@ Without async/await JavaScript would either freeze the whole page waiting for th
 Async - "this function contains code that takes time"
 Await - "pause here and wait for this to finish before moving to the next line"
 
+## PlayerPage requirements:
+
+1. Read the id from the URL using useParams
+2. Fetch the player, season stats, and game logs when the page loads
+3. Display them
+
+useParams to get the id from the URL
+useState for player, seasonStats, and gameLogs
+useEffect to fetch all three when the page loads
+Basic displays of the player's name and stats

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Player } from "../types/Player";
+import { useParams } from "react-router-dom";
 
 function PlayerPage() {
 
