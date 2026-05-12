@@ -1421,3 +1421,17 @@ Add two things to PlayerPage.tsx:
 
 1. SeasonStat.ts - based on PlayerSeasonStat.java entity
 2. GameLog.ts - based on PlayerGameStat.java entity
+
+# May 11th 2026
+
+Void - "method returns nothing"
+Asyc/await is about timing not return type
+
+Service calls API, it takes time.
+
+JavaScript is single threaded (1 thing at a time)
+Without async/await JavaScript would either freeze the whole page waiting for the response, or skip past the API call before the data arrives
+
+Async - "this function contains code that takes time"
+Await - "pause here and wait for this to finish before moving to the next line"
+
