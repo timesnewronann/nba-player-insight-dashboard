@@ -1445,3 +1445,26 @@ useParams to get the id from the URL
 useState for player, seasonStats, and gameLogs
 useEffect to fetch all three when the page loads
 Basic displays of the player's name and stats
+
+HomePage doesn't need useParams because it doesn't care about the URL
+HomePage has its own search input where the user types what they want
+The data comes from user interaction not the URL
+
+PlayerPage is different - it gets told which player to show via the URL itself.
+When you click Lebron James, the app navigates to /player/2196
+
+The 2196 is in the URL and that's the only way PplayerPage knows which player to fetch.
+
+There's no search box, no user input - the URL is the input.
+
+## HomePage - user provides data through typing
+
+## PlayerPage - URL provides data through the path
+
+useParams is just React Router's way of reading that URL data.
+It's the equivalent of your SpringBoot @PathVariable - you used @PathVariable Long id to read the id from the URL in Java.
+useParams does the same thing on th efrontend
+
+## UseParams in React is the frontend equivalent of @PathVariable in Spring Boot
+
+Both read a value from the URL path.
