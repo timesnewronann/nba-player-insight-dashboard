@@ -1468,3 +1468,37 @@ useParams does the same thing on th efrontend
 ## UseParams in React is the frontend equivalent of @PathVariable in Spring Boot
 
 Both read a value from the URL path.
+
+1. Declare Sttate for player, seasonStats, and gameLogs
+2. Use useEffect to fetch all three when the component loads
+3. Display the player's name
+
+useState is React Hook that lets you add a state variable to your component
+
+const [state, setState]= useState(initialState)
+
+# May 12th 2026
+
+useEffect can't be async directly
+Define an async function inside it and call it immediately
+
+"Do I need to set it to a variable"
+I need to capture the result and pass it to the state setter
+
+Without await and the state setter, the component will never know the data arrived
+
+"Why do we use params.id not player or seasonStats?"
+
+params.id is the player's id number from the URL (we use this to request the data)
+
+player, seasonStats, and gameLog are where we store the data after it comes back
+
+We can't use player to fetch the player because player is null until the fetch completes
+
+You'd be passing null the API call
+
+Ex:
+We are ordering food.
+We give hte waiter our table number (params.id) to identify who's ordering.
+The food (player) comes back after.
+We can't give the waiter the food to get the food
