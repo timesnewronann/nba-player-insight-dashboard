@@ -5,7 +5,7 @@ import PlayerPage from './pages/PlayerPage'
 
 function App() {
   return (
-    <div className="app">
+    <div className="app min-h-screen bg-gray-950 text-white">
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/player/:id" element={<PlayerPage/>} />
