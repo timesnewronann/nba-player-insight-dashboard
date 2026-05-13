@@ -1502,3 +1502,19 @@ We are ordering food.
 We give hte waiter our table number (params.id) to identify who's ordering.
 The food (player) comes back after.
 We can't give the waiter the food to get the food
+
+If percentage is null we get NaN displayed
+
+We fix this with
+nullish coalescing operator ??
+"If this is null, use this default value instead"
+
+You can't render a JavaScript object directly in JSX you must access specific primitive fields like strings and numbers
+
+## This feature built:
+Backend: Spring Boot Rest API, 5 endpoints, PostgreSQL database, JPA entities, CORS config, unit tests
+
+Data Pipeline: 3 Python ETL Scripts, 23,000+ game log rows, 530 players, 30 teams
+
+Frontend: React + TypeScript, routing, service layer, type definitions, state management, API Integration
+

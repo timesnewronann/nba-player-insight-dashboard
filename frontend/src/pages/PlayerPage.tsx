@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import type { Player } from "../types/Player";
 import type { SeasonStat } from "../types/SeasonStat";
 import type { GameLog } from "../types/GameLog";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getPlayerById, getGameLogs, getSeasonStats } from "../services/PlayerService";
 
 export default function PlayerPage() {
@@ -45,18 +45,46 @@ export default function PlayerPage() {
                     <div key = {seasonStat.id}>
                         <ul>
                             <li>Season: {seasonStat.season}</li>
-                            <li>Games Player: {seasonStat?.gamesPlayed}</li>
+                            <li>Games Played: {seasonStat?.gamesPlayed}</li>
                             <li>Minutes Per Game: {seasonStat?.minutesPerGame}</li>         
                             <li>Points Per Game: {seasonStat?.pointsPerGame}</li>   
                             <li>Rebounds Per Game: {seasonStat?.reboundsPerGame}</li>
                             <li>Assists Per Game: {seasonStat?.assistsPerGame}</li>
                             <li>Steals Per Game: {seasonStat?.stealsPerGame}</li>
-                            
+                            <li>Blocks Per Game: {seasonStat?.blocksPerGame}</li>
+                            <li>Field Goal Percentage: {((seasonStat.fieldGoalPct ?? 0) *100).toFixed(2)}%</li>
+                            <li>Three Point Percentage: {((seasonStat.threePointPct ?? 0) * 100).toFixed(2)}%</li>
+                            <li>Free Throw Percentage: {((seasonStat.freeThrowPct  ?? 0)* 100).toFixed(2)}%</li>
                         </ul>
                     
                     </div>
+                    
                 ))}
-    
+            
+            <h2>Game Logs</h2>
+                {gameLogs.map((gameLog) =>(
+                    <div key = {gameLog.id}>
+                        <ul>
+                            <li>Win/Loss: {gameLog.winLoss}</li>
+                            <li>Season: {gameLog.game.season}</li>
+                            <li>Game Date: {gameLog.game?.gameDate}</li>
+                            <li>Away Team: {gameLog.game?.awayTeam?.abbreviation}</li>
+                            <li>Home Team: {gameLog.game?.homeTeam?.abbreviation}</li>
+                            <li>Points Scored: {gameLog.ptsScored}</li>
+                            <li>Assists: {gameLog.assists}</li>
+                            <li>Rebounds: {gameLog.rebounds}</li>
+                            <li>Blocks: {gameLog.blocks}</li>
+                            <li>Steals: {gameLog.steals}</li>
+                            <li>Minutes Player: {gameLog.minutes}</li>
+                            <li>Field Goal Percentage: {((gameLog.fieldGoalPct ?? 0) *100).toFixed(2)}%</li>
+                            <li>Three Point Percentage: {((gameLog.threePointPct ?? 0) * 100).toFixed(2)}%</li>
+                            <li>Free Throw Percentage: {((gameLog.freeThrowPct  ?? 0)* 100).toFixed(2)}%</li>
+                            <li>Turnovers: {gameLog.turnovers}</li>
+                        </ul>
+
+                    </div>
+                ))}
+            
         </div>
     )
 
