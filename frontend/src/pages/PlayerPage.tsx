@@ -30,37 +30,43 @@ export default function PlayerPage() {
         fetchData();
 
     }, []); // <- tells React to run once when component loads
+    if (!player) return (
+        <div className="flex items-center justify-center min-h-screen">
+            <p className="text-fg-muted">Loading...</p>
+        </div>
+    )
 
     return (
         <div>
-            <h1>{player?.fullName}</h1>
-            <h2>Player ID:{player?.id}</h2>
-            <ul>
-                <li>Position: {player?.position}</li>
-                <li>Height: {player?.height}</li>
-                <li>Weight: {player?.weight}</li>
-            </ul>
+            <div> {/*Player Header*/}
+                <h1>{player?.fullName}</h1>
+                <h2>Player ID:{player?.id}</h2>
+                <ul>
+                    <li>Position: {player?.position}</li>
+                    <li>Height: {player?.height}</li>
+                    <li>Weight: {player?.weight}</li>
+                </ul>
+            </div>
+            <div> {/*Season Stats Grid*/}
             <h2>Season Stats</h2>
-                {seasonStats.map((seasonStat) =>(
-                    <div key = {seasonStat.id}>
-                        <ul>
-                            <li>Season: {seasonStat.season}</li>
-                            <li>Games Played: {seasonStat?.gamesPlayed}</li>
-                            <li>Minutes Per Game: {seasonStat?.minutesPerGame}</li>         
-                            <li>Points Per Game: {seasonStat?.pointsPerGame}</li>   
-                            <li>Rebounds Per Game: {seasonStat?.reboundsPerGame}</li>
-                            <li>Assists Per Game: {seasonStat?.assistsPerGame}</li>
-                            <li>Steals Per Game: {seasonStat?.stealsPerGame}</li>
-                            <li>Blocks Per Game: {seasonStat?.blocksPerGame}</li>
-                            <li>Field Goal Percentage: {((seasonStat.fieldGoalPct ?? 0) *100).toFixed(2)}%</li>
-                            <li>Three Point Percentage: {((seasonStat.threePointPct ?? 0) * 100).toFixed(2)}%</li>
-                            <li>Free Throw Percentage: {((seasonStat.freeThrowPct  ?? 0)* 100).toFixed(2)}%</li>
-                        </ul>
-                    
-                    </div>
-                    
-                ))}
-            
+                <div> {/*PPG */}
+                    <span>{seasonStats[0]?.pointsPerGame}</span>
+                    <span>PPG</span>
+                </div>
+                <div> {/*APG */}
+                    <span>{seasonStats[0]?.assistsPerGame}</span>
+                    <span>APG</span>
+                </div>
+                <div> {/*RPG */}
+                    <span>{seasonStats[0]?.reboundsPerGame}</span>
+                    <span>RPG</span>
+                </div>
+                <div> {/*FG% */}
+                    <span>{((seasonStats[0]?.fieldGoalPct ?? 0) *100).toFixed(2)}</span>
+                    <span>FG%</span>
+                </div>
+            </div>
+            <div> {/*Game Logs Table*/}
             <h2>Game Logs</h2>
                 {gameLogs.map((gameLog) =>(
                     <div key = {gameLog.id}>
@@ -84,6 +90,10 @@ export default function PlayerPage() {
 
                     </div>
                 ))}
+            </div>
+            <div> {/* Shot Chart */}
+                <h2>Shot Chart</h2>
+            </div>
             
         </div>
     )

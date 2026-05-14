@@ -1553,3 +1553,24 @@ If we put pt-20 on the outer div that also wraps the navbar, and we'd be pushing
 Which would leave a gap at the very top of the screen above the navbar
 
 We wouldn't add top margin to the netire house becauase the ceiling is high we would just arrange the furniture to fit under it
+
+## PlayerPage.tsx
+
+### Section 1 - Player Header
+
+- Player initials in a circle
+- Full name in Bebas Neue large
+- Position, active status
+- Data: player.fullname, pplayer.position, player.active
+
+### Section 2 - Season Stats Grid
+
+- Four stat boxes side by side: PPG, RPG, APG, FG%
+- Data: seasonStats[0].pointsPergame, reboundsPerGame, assistsPerGame, fieldGoalPct
+
+### Section 3 - Game Logs Table
+
+- Each row: W/L badge, opponent, PTS, REB, AST, FG%
+- Data: gameLog.winLoss, ptsScored, rebounds, assists, fieldGoalPct
+
+### Section 4 - Shot Chart (placeholder for now)
