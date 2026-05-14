@@ -1533,3 +1533,23 @@ Every page and component is a Lego Piece.
 We build each piece separately and then combine in all together in App.tsx
 
 React mental model - small pieces assembled into bigger pieces assembled into the full app
+
+Navbar is fixed which means it's removed from the normal document flow
+It floats above everything else and doesn't take up space in the layout
+
+When the page renders, the content starts at the very top - directly behind the navbar
+
+```
+┌─────────────────────┐
+│  NAVBAR (fixed)     │  ← floats above, 80px tall
+├─────────────────────┤
+│  pt-20 gap          │  ← 80px of padding pushes content down
+│  actual content     │
+│  starts here        │
+└─────────────────────┘
+```
+
+If we put pt-20 on the outer div that also wraps the navbar, and we'd be pushing the navbar down too
+Which would leave a gap at the very top of the screen above the navbar
+
+We wouldn't add top margin to the netire house becauase the ceiling is high we would just arrange the furniture to fit under it

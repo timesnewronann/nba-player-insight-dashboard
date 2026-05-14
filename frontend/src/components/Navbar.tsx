@@ -7,9 +7,9 @@ function Navbar() {
                 <span className="text-fg-accent">GENERAL</span>
             </div>
             <div className="flex gap-8">
-                <a className="text-fg muted hover: text-fg-text text-xs tracking-widest uppercase transition-colors cursor-pointer">Players</a>
-                <a className="text-fg muted hover: text-fg-text text-xs tracking-widest uppercase transition-colors cursor-pointer">Teams</a>
-                <a className="text-fg muted hover: text-fg-text text-xs tracking-widest uppercase transition-colors cursor-pointer">Stats</a>
+                <a className="text-fg-muted hover:text-fg-text text-xs tracking-widest uppercase transition-colors cursor-pointer">Players</a>
+                <a className="text-fg-muted hover:text-fg-text text-xs tracking-widest uppercase transition-colors cursor-pointer">Teams</a>
+                <a className="text-fg-muted hover:text-fg-text text-xs tracking-widest uppercase transition-colors cursor-pointer">Stats</a>
             </div>
             <button>
                 Toggle
