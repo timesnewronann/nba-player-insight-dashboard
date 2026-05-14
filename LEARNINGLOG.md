@@ -1525,3 +1525,11 @@ Frontend: React + TypeScript, routing, service layer, type definitions, state ma
 2. Data Quality: position, height, weight are null for most players. Write a quick ETL update to populate those columns from nba_api before going live
 3. Environment config: API URL is hardcoded as http://localhost:8080, before deployment need to update to an environment variable pointing to the hosted backend URL
 4. Deployment: railway for Spring Boot backend, Vercel for React frontend
+
+# May 13th 2026:
+
+App.tsx is the Lego Set
+Every page and component is a Lego Piece.
+We build each piece separately and then combine in all together in App.tsx
+
+React mental model - small pieces assembled into bigger pieces assembled into the full app
