@@ -17,20 +17,27 @@ function HomePage() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
             <h1 className="font-display text-8xl text-fg-text tracking-wide text-center">READ THE FLOOR</h1>
-            <p className="text-fg-muted text-center max-w-md mt-4">Shot charts. Game logs. Season Stats. Every player, Every Game. All in One Place</p>
-            <div className="relative w-full max-w-md mt-8">
-                <input className="w-full max-w-md bg-fg-bg3 border border-white/10 rounded px-4 py-3 text-fg-text placeholder-fg-muted outline-none focus:border-fg-accent mt-8" type="text" 
-                placeholder="Search any NBA player..."
-                value={searchQuery}
-                onChange={(e) => {
-                    setSearchQuery(e.target.value)
-                    handleSearch()
-                }}
-                />
-                <button className="mt-3 px-8 bg-fg-aceent text-white font-semibold rounded hover:bg-orange-600 transition-colors" onClick={handleSearch}>Search</button>
-            </div>
+            <p className="text-fg-muted text-center max-w-md mx-auto mt-4">Shot charts. Game logs. Season Stats. Every player, Every Game. All in One Place</p>
+            <div className="relative w-full max-w-lg mt-8">
+                <div className="flex gap-2">
+                    <input 
+                    className="flex-1 bg-fg-bg3 border border-white/10 rounded px-4 py-3 text-fg-text placeholder-fg-muted outline-none focus:border-fg-accent" 
+                    type="text" 
+                    placeholder="Search any NBA player..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                        setSearchQuery(e.target.value)
+                        handleSearch()
+                    }}
+                    />
+                    <button 
+                    className="px-6 py-3 bg-fg-accent text-white font-semibold rounded hover:bg-orange-600 transition-colors" 
+                    onClick={handleSearch}>Search
+
+                    </button>
+                </div>
             {players.length > 0 && (
-                <div className="w-full max-w-md bg-fg-bg3 border border-white/10 rounded mt-1">
+                <div className="w-full max-w-sm bg-fg-bg3 border border-white/10 rounded mt-1">
                     {players.map((player) => (
                         <Link to={`/player/${player.id}`}
                          key={player.id}
@@ -41,6 +48,7 @@ function HomePage() {
                     ))}
                 </div>
             )}
+            </div>
 
         </div>
         )
