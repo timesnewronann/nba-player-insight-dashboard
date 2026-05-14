@@ -1574,3 +1574,10 @@ We wouldn't add top margin to the netire house becauase the ceiling is high we w
 - Data: gameLog.winLoss, ptsScored, rebounds, assists, fieldGoalPct
 
 ### Section 4 - Shot Chart (placeholder for now)
+
+## To DO:
+
+Update database with ETL script we are missing some data to fetch game dates from the NBA API
+
+1. Update load_team_players.py to fetch position, height, weight from nba_api
+2. Update load_player_game_logs.py to populate game dates and team data
