@@ -1581,3 +1581,30 @@ Update database with ETL script we are missing some data to fetch game dates fro
 
 1. Update load_team_players.py to fetch position, height, weight from nba_api
 2. Update load_player_game_logs.py to populate game dates and team data
+
+# TO DO LIST:
+
+1. Fix game dates and team data in ETL - one session
+2. Add player photo to frontend using CDN - 10 minutes
+3. Update player details ETL - one session
+4. Add playoff and 2025-26 data - one session
+5. Live Data - separate session
+
+### Question:
+
+What are the type of problems we've fixed today
+
+- data problems vs code problems
+- why dooes that distinction matters
+
+We fixed code problems today that helped with the frontend's formatting.
+Our data problems would be the missing ingested data that would be displayed on our frontend
+
+This matters because a data problem would be missing inputs and resulting in improper outputs
+Code problem would be a direct error message based on a certain line
+
+### Correction:
+
+Data problems can also cause code errors (like null crashes that were fixed with ??)
+Root cause diagnosis is what matters: is the data wrong or is the logic wrong
+

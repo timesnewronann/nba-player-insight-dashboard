@@ -10,6 +10,7 @@ export default function PlayerPage() {
     const [player, setPlayer] = useState<Player | null>(null);
     const [seasonStats, setSeasonStats] = useState<SeasonStat[]>([]);
     const [gameLogs, setGameLogs]= useState<GameLog[]>([])
+    const [isModalOpen, setIsModalOpen] = useState(false)
 
     useEffect( () => {
         // fetch code
@@ -39,7 +40,17 @@ export default function PlayerPage() {
     return (
         <div className="max-w-3xl mx-auto px-4 py-8">
             <div className="bg-fg-bg2 border border-white/10 rounded-lg p-6 mb-4"> {/*Player Header*/}
-                <h1 className="font-display text-5xl text-fg-text">{player?.fullName}</h1>
+                <div className="flex items-center gap-6">
+                    <img
+                        src={`https://cdn.nba.com/headshots/nba/latest/1040x760/${player.nbaPlayerId}.png`}
+                        alt={player.fullName}
+                        className="w-20 h-20 rounded-full object-cover"
+                        onError={(e) =>{
+                            e.currentTarget.style.display = 'none'
+                        }}
+                    />
+                    <h1 className="font-display text-5xl text-fg-text">{player?.fullName}</h1>
+                </div>
                 <div className="flex gap-4 mt-2 text-sm text-fg-muted">
                     <span>{player?.position}</span>
                     <span>{player?.active ? 'Active' : 'Inactive'}</span>
@@ -67,6 +78,7 @@ export default function PlayerPage() {
                     <span className="block text-xs text-fg-muted uppercase tracking-widest mt-1">FG%</span>
                 </div>
             </div>
+
             <h2 className="font-mono text-xl text-fg-text uppercase tracking-widest mb-4">Game Logs</h2>
             <div className="bg-fg-bg2 border border-white/10 rounded-lg p-6"> {/*Game Logs Table*/}
                 {gameLogs.map((gameLog) =>(
