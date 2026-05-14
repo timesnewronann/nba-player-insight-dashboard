@@ -37,9 +37,9 @@ export default function PlayerPage() {
     )
 
     return (
-        <div>
-            <div> {/*Player Header*/}
-                <h1>{player?.fullName}</h1>
+        <div className="max-w-3xl mx-auto px-4 py-8">
+            <div className="bg-fg-bg2 border border-white/10 rounded-lg p-6 mb-4"> {/*Player Header*/}
+                <h1 className="font-display text-5xl text-fg-text">{player?.fullName}</h1>
                 <h2>Player ID:{player?.id}</h2>
                 <ul>
                     <li>Position: {player?.position}</li>
