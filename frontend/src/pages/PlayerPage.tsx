@@ -44,8 +44,9 @@ export default function PlayerPage() {
                     <img
                         src={`https://cdn.nba.com/headshots/nba/latest/1040x760/${player.nbaPlayerId}.png`}
                         alt={player.fullName}
-                        className="w-20 h-20 rounded-full object-cover"
-                        onError={(e) =>{
+                        className="w-20 h-20 rounded-full object-cover cursor-pointer"
+                        onClick={() => setIsModalOpen(true)}
+                        onError={(e) => {
                             e.currentTarget.style.display = 'none'
                         }}
                     />
@@ -55,8 +56,19 @@ export default function PlayerPage() {
                     <span>{player?.position}</span>
                     <span>{player?.active ? 'Active' : 'Inactive'}</span>
                 </div>
-
             </div>
+            {isModalOpen && (
+                <div
+                    className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 cursor-pointer"
+                    onClick={() => setIsModalOpen(false)}
+                >
+                    <img 
+                    src={`https://cdn.nba.com/headshots/nba/latest/1040x760/${player.nbaPlayerId}.png`}
+                    alt={player.fullName}
+                    className="max-w-sm rounded-lg"
+                    />
+                </div>
+            )}
             <h2 className="font-mono text-xl text-fg-text">
                 {seasonStats[0]?.season} Season Stats
                 </h2>
@@ -89,7 +101,9 @@ export default function PlayerPage() {
                         </div>
                         {/* Opponent label */}
                         <span className="text-fg-muted text-sm flex-1">
-                            {gameLog.game.season}
+                            {gameLog.game?.gameDate
+                                ? new Date(gameLog.game.gameDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})
+                                : gameLog.game.season}
                         </span>
 
                         {/* Stats */}
@@ -101,7 +115,7 @@ export default function PlayerPage() {
                         <span className="text-fg-muted text-xs w-6">AST</span>
 
                         {/* FG% - green above 50%, red below 50% */}
-                        <span className={`font-mono text-sm ${(gameLog.fieldGoalPct ?? 0) >= 0.5 ? 'text-green-400' : 'text-red-400'}`}>
+                        <span className={`font-mono text-sm ${(gameLog.fieldGoalPct ?? 0) >= (seasonStats[0]?.fieldGoalPct ?? 0) ? 'text-green-400' : 'text-red-400'}`}>
                             {((gameLog.fieldGoalPct ?? 0) * 100).toFixed(0)}%
                         </span>
                         {/* Potentially Keep these for advanced indepth stats when we click on a specific game to get more details */}

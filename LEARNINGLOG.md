@@ -1608,3 +1608,7 @@ Code problem would be a direct error message based on a certain line
 Data problems can also cause code errors (like null crashes that were fixed with ??)
 Root cause diagnosis is what matters: is the data wrong or is the logic wrong
 
+# May 14th 2026
+
+Update the color of the field goal so that it's green if it's greater than or equal to the field goal % average
+And red if it's less than average

@@ -99,7 +99,7 @@ try:
 
     # -------------------------
     # STEP 4.5: BUILD TEAMS ID LOOKUP DICTIONARY
-    # -------------------------
+    # ------------------------
     cursor.execute(
         """
         SELECT id, abbreviation FROM teams
@@ -143,29 +143,68 @@ try:
             # read nba_team_id and nba_game_id from the row
             nba_game_id = row["Game_ID"]
 
-            team_abbreviation = row["MATCHUP"][0:3]
+            # read GAME_DATE
+            nba_game_date = row["GAME_DATE"]
 
-            # translate team abbreviation or skip if not found
+            matchup = row["MATCHUP"]
+
+            team_abbreviation = matchup[0:3]
+
+            home_abbrev = None
+            away_abbrev = None
+
             if team_abbreviation not in abbreviation_to_db_team_id:
                 skipped_count += 1
                 continue
 
+            if ' vs. ' in matchup:
+                home_abbrev = matchup[0:3]
+                away_abbrev = matchup[-3:]  # last 3 characters
+            elif ' @ ' in matchup:
+                away_abbrev = matchup[0:3]
+                home_abbrev = matchup[-3:]
+
+            if not home_abbrev or not away_abbrev:
+                skipped_count += 1
+                continue
+
+            # translate team abbreviation or skip if not found
+            if home_abbrev not in abbreviation_to_db_team_id:
+                skipped_count += 1
+                continue
+
+            if away_abbrev not in abbreviation_to_db_team_id:
+                skipped_count += 1
+                continue
+
             db_team_id = abbreviation_to_db_team_id[team_abbreviation]
+            home_team_id = abbreviation_to_db_team_id[home_abbrev]
+            away_team_id = abbreviation_to_db_team_id[away_abbrev]
 
             # insert into games table
             cursor.execute(
                 """
                 INSERT INTO games (
                     nba_game_id,
-                    season
+                    season,
+                    game_date,
+                    home_team_id,
+                    away_team_id
                 )
-                VALUES(%s, %s)
+                VALUES(%s, %s, %s, %s, %s)
                 ON CONFLICT (nba_game_id) 
-                DO NOTHING
+                DO UPDATE SET
+                    season = EXCLUDED.season,
+                    game_date = EXCLUDED.game_date,
+                    home_team_id = EXCLUDED.home_team_id,
+                    away_team_id = EXCLUDED.away_team_id
                 """,
                 (
                     nba_game_id,
                     season_to_load,
+                    nba_game_date,
+                    home_team_id,
+                    away_team_id
 
                 )
             )
