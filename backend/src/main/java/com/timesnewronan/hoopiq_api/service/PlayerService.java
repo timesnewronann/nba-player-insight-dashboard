@@ -79,7 +79,7 @@ public class PlayerService {
         getPlayerById(playerId);
 
         // fetch all season stat rows for the requested player
-        return playerSeasonStatRepository.findByPlayerId(playerId);
+        return playerSeasonStatRepository.findByPlayerIdOrderBySeasonDesc(playerId);
     }
 
     /*
@@ -90,6 +90,6 @@ public class PlayerService {
         getPlayerById(playerId);
 
         // fetch the game stats for that player
-        return playerGameStatRepository.findByPlayerId(playerId);
+        return playerGameStatRepository.findByPlayerIdOrderByGameDateDesc(playerId);
     }
 }

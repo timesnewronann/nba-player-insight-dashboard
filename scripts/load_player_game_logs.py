@@ -40,7 +40,7 @@ if not db_host or not db_name or not db_user or not db_password:
 # STEP 1: CHOOSE THE SEASON WE WANT TO LOAD
 # -------------------------
 # Use 2024-25 season
-season_to_load = "2024-25"
+season_to_load = "2025-26"
 
 # -------------------------
 # STEP 2: PREP VARIABLES

@@ -9,5 +9,5 @@ import java.util.List;
 public interface PlayerSeasonStatRepository extends JpaRepository<PlayerSeasonStat, Long> {
     // This interface tells Spring Data JPA to find all season stat rows
     // where the related player id matches the given values
-    List<PlayerSeasonStat> findByPlayerId(Long playerId);
+    List<PlayerSeasonStat> findByPlayerIdOrderBySeasonDesc(Long playerId);
 }
