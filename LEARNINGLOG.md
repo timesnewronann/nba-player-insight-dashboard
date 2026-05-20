@@ -1310,9 +1310,305 @@ Then the outer loop goes through each active player, calls the NBA API to get th
 - Use ResponseStatusException in Spring service layers instead of RuntimeException so the API returns meaningful HTTP status codes like 404 not found to the client instead of a generic 500 Internal Server Error
 
 # April 29th 2026
+
 Unit tests with Mockito run in ~1 second because they don't need to load the database or Spring context
 
 Ingeration tests with @SpringBootTest take ~9 seconds because they start the whole application
 
 Fast Tests get run more often
 
+CORS = Cross-Origin Resource Sharing
+
+- The Browser is protective
+- When React app at localhost:5173 tries to fetch data from localhost:8080, the browser says "wait - these are two different origins, different ports. I'm not going to allow this unless the server explicitly says it's okay."
+
+Example:
+Bouncer at a club
+The frontend is a guest trying to get in.
+The backend is the club
+CORS is the bouncer
+By default he says no to everyone from a different address.
+You have to tell the bouncer "hey, let people from localhost:5173 in."
+
+You fix it in your Spring Boot backend by adding a CORS configuration that says "requests from localhost:5173 are allowed."
+
+# May 1st 2026
+
+States are any data that can change overtime and when it changes React re-renders the component to reflect the new value
+
+EX:
+When a user types in a search box, the text they type is the state
+
+When results come back from the API the results are the state
+
+When a player is seelected the player is the state
+
+A Prop is an attribute you pass to a JSX element
+`<intput type="text" placeholder="Search any NBA player..."/>`
+
+# Only event handler props need functions because they're responding to something happening.
+
+Anything that starts with on is an event handler:
+
+- onChange
+- onClick
+- onSubmit
+- onFocus
+
+# Regular Props just take values
+
+- value={searchQuery}
+- type="text"
+- placeholder="..."
+- disabled={true}
+
+The playerService.ts file makes an HTTP request to our playerService.java SpringBoot endpoint at
+http://localhost:8080/api/players/search?query=...
+
+Java code runs our backend server
+The React code runs in our browser
+These two communicate over HTTP not directly
+
+playerService.ts function needs:
+
+1. Takes a search query string as a paremeter
+2. Makes a GET request to http://localhost:8080/api/players/search?query=...
+3. Returns the player result
+
+## Promise: I don't have this value yet but I will soon.
+
+JavaScript doesn't stop it keeps running
+"Horses don't stop they keep going"
+Promise is representing the future value that will arrive
+
+Example: Waiter gives you a ticket for food at the restaurant promising that you'll get your order.
+
+# May 5th 2026
+
+To make search work today I created an event handler handleSearch which calls the searchPlayers function with the queried player
+It then update the player state with the result so the search is visible on the search bar
+We had an onChange event where we call the setSearchQuery function so that the searchQuery is set and then we call the handleSearch
+
+We then mapped the player after
+
+1. State: useState stores data that can change
+   searchQuery: what the user typed
+   players: the results from the API
+
+When the state updates, React automatically re-renders the component
+
+2. Event handlers: functions that run when something happens.
+   onChange fires on every keystroke and updates searchQuery
+   onClick on the button calls handleSearch
+   Events connect user actions to state changes
+
+3. Rendering lists: .map() loops through the players array and returns JSX for each item.
+   The key prop tells React how to track each item uniquely
+
+# May 7th 2026
+
+## Player Page Requirements
+
+1. Read the id from the URL
+2. Call Spring Boot API to get that player's details
+3. Display the player's name, stats, and game logs
+
+useParams is the React Router hook that reads URL parameters
+ex: {id: "2196"}
+
+Tasks:
+Add two things to PlayerPage.tsx:
+
+1. SeasonStat.ts - based on PlayerSeasonStat.java entity
+2. GameLog.ts - based on PlayerGameStat.java entity
+
+# May 11th 2026
+
+Void - "method returns nothing"
+Asyc/await is about timing not return type
+
+Service calls API, it takes time.
+
+JavaScript is single threaded (1 thing at a time)
+Without async/await JavaScript would either freeze the whole page waiting for the response, or skip past the API call before the data arrives
+
+Async - "this function contains code that takes time"
+Await - "pause here and wait for this to finish before moving to the next line"
+
+## PlayerPage requirements:
+
+1. Read the id from the URL using useParams
+2. Fetch the player, season stats, and game logs when the page loads
+3. Display them
+
+useParams to get the id from the URL
+useState for player, seasonStats, and gameLogs
+useEffect to fetch all three when the page loads
+Basic displays of the player's name and stats
+
+HomePage doesn't need useParams because it doesn't care about the URL
+HomePage has its own search input where the user types what they want
+The data comes from user interaction not the URL
+
+PlayerPage is different - it gets told which player to show via the URL itself.
+When you click Lebron James, the app navigates to /player/2196
+
+The 2196 is in the URL and that's the only way PplayerPage knows which player to fetch.
+
+There's no search box, no user input - the URL is the input.
+
+## HomePage - user provides data through typing
+
+## PlayerPage - URL provides data through the path
+
+useParams is just React Router's way of reading that URL data.
+It's the equivalent of your SpringBoot @PathVariable - you used @PathVariable Long id to read the id from the URL in Java.
+useParams does the same thing on th efrontend
+
+## UseParams in React is the frontend equivalent of @PathVariable in Spring Boot
+
+Both read a value from the URL path.
+
+1. Declare Sttate for player, seasonStats, and gameLogs
+2. Use useEffect to fetch all three when the component loads
+3. Display the player's name
+
+useState is React Hook that lets you add a state variable to your component
+
+const [state, setState]= useState(initialState)
+
+# May 12th 2026
+
+useEffect can't be async directly
+Define an async function inside it and call it immediately
+
+"Do I need to set it to a variable"
+I need to capture the result and pass it to the state setter
+
+Without await and the state setter, the component will never know the data arrived
+
+"Why do we use params.id not player or seasonStats?"
+
+params.id is the player's id number from the URL (we use this to request the data)
+
+player, seasonStats, and gameLog are where we store the data after it comes back
+
+We can't use player to fetch the player because player is null until the fetch completes
+
+You'd be passing null the API call
+
+Ex:
+We are ordering food.
+We give hte waiter our table number (params.id) to identify who's ordering.
+The food (player) comes back after.
+We can't give the waiter the food to get the food
+
+If percentage is null we get NaN displayed
+
+We fix this with
+nullish coalescing operator ??
+"If this is null, use this default value instead"
+
+You can't render a JavaScript object directly in JSX you must access specific primitive fields like strings and numbers
+
+## This feature built:
+
+Backend: Spring Boot Rest API, 5 endpoints, PostgreSQL database, JPA entities, CORS config, unit tests
+
+Data Pipeline: 3 Python ETL Scripts, 23,000+ game log rows, 530 players, 30 teams
+
+Frontend: React + TypeScript, routing, service layer, type definitions, state management, API Integration
+
+## TODO before Deployment
+
+1. Frontend Styling: Make this frontend look like the concept
+2. Data Quality: position, height, weight are null for most players. Write a quick ETL update to populate those columns from nba_api before going live
+3. Environment config: API URL is hardcoded as http://localhost:8080, before deployment need to update to an environment variable pointing to the hosted backend URL
+4. Deployment: railway for Spring Boot backend, Vercel for React frontend
+
+# May 13th 2026:
+
+App.tsx is the Lego Set
+Every page and component is a Lego Piece.
+We build each piece separately and then combine in all together in App.tsx
+
+React mental model - small pieces assembled into bigger pieces assembled into the full app
+
+Navbar is fixed which means it's removed from the normal document flow
+It floats above everything else and doesn't take up space in the layout
+
+When the page renders, the content starts at the very top - directly behind the navbar
+
+```
+┌─────────────────────┐
+│  NAVBAR (fixed)     │  ← floats above, 80px tall
+├─────────────────────┤
+│  pt-20 gap          │  ← 80px of padding pushes content down
+│  actual content     │
+│  starts here        │
+└─────────────────────┘
+```
+
+If we put pt-20 on the outer div that also wraps the navbar, and we'd be pushing the navbar down too
+Which would leave a gap at the very top of the screen above the navbar
+
+We wouldn't add top margin to the netire house becauase the ceiling is high we would just arrange the furniture to fit under it
+
+## PlayerPage.tsx
+
+### Section 1 - Player Header
+
+- Player initials in a circle
+- Full name in Bebas Neue large
+- Position, active status
+- Data: player.fullname, pplayer.position, player.active
+
+### Section 2 - Season Stats Grid
+
+- Four stat boxes side by side: PPG, RPG, APG, FG%
+- Data: seasonStats[0].pointsPergame, reboundsPerGame, assistsPerGame, fieldGoalPct
+
+### Section 3 - Game Logs Table
+
+- Each row: W/L badge, opponent, PTS, REB, AST, FG%
+- Data: gameLog.winLoss, ptsScored, rebounds, assists, fieldGoalPct
+
+### Section 4 - Shot Chart (placeholder for now)
+
+## To DO:
+
+Update database with ETL script we are missing some data to fetch game dates from the NBA API
+
+1. Update load_team_players.py to fetch position, height, weight from nba_api
+2. Update load_player_game_logs.py to populate game dates and team data
+
+# TO DO LIST:
+
+1. Fix game dates and team data in ETL - one session
+2. Add player photo to frontend using CDN - 10 minutes
+3. Update player details ETL - one session
+4. Add playoff and 2025-26 data - one session
+5. Live Data - separate session
+
+### Question:
+
+What are the type of problems we've fixed today
+
+- data problems vs code problems
+- why dooes that distinction matters
+
+We fixed code problems today that helped with the frontend's formatting.
+Our data problems would be the missing ingested data that would be displayed on our frontend
+
+This matters because a data problem would be missing inputs and resulting in improper outputs
+Code problem would be a direct error message based on a certain line
+
+### Correction:
+
+Data problems can also cause code errors (like null crashes that were fixed with ??)
+Root cause diagnosis is what matters: is the data wrong or is the logic wrong
+
+# May 14th 2026
+
+Update the color of the field goal so that it's green if it's greater than or equal to the field goal % average
+And red if it's less than average
