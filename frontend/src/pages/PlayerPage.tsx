@@ -102,7 +102,7 @@ export default function PlayerPage() {
                         {/* Opponent label */}
                         <span className="text-fg-muted text-sm flex-1">
                             {gameLog.game?.gameDate
-                                ? new Date(gameLog.game.gameDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})
+                                ? new Date(gameLog.game.gameDate + "T12:00:00").toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})
                                 : gameLog.game.season}
                         </span>
 
