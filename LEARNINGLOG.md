@@ -1653,3 +1653,9 @@ The four Spring Boot Layers:
 - Service holds the business logic and methods
 - Controller handles HTTP requests and calls the service
   Each layer has one job and depends only on the layer below it
+
+## Adding Teams backend endpoints
+
+1. GET /api/teams - returns all 30 teams
+2. GET /api/teams/{id} - returns one team
+3. GET /api/teams/{id}/players - returns all players on a team
