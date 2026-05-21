@@ -1612,3 +1612,44 @@ Root cause diagnosis is what matters: is the data wrong or is the logic wrong
 
 Update the color of the field goal so that it's green if it's greater than or equal to the field goal % average
 And red if it's less than average
+
+# May 18th 2026
+
+We merged our frontend feature branch
+
+## TODO
+
+### Missing Pages:
+
+1. Player page (/players) - searchable list of all players
+2. Teams page (/teams) - list of all 30 teams, click a team to see roster
+3. Stats page (/stats) - leaderboards, maybe top scorers/ rebounders/ assisters
+
+### Missing backend endpoints:
+
+1. GET /api/teams - return all teams
+2. GET /api/team - return one team
+3. GET /api/teams/{id}/players - return players on a team
+
+### Missing Data:
+
+1. Player position, height, weight - still null
+2. Team rosters - team_id on players table still null
+
+What is the difference between an MVP and a finished product, and why does it matter to deploy even when things are missing?
+An mvp is a minimal viable product is the most basic bare bones version of product that is acceptable a finished product is the complete thing with every feature.
+It matters to deploy even when things are missing because sometimes we will always feel like its not good enough but we should just submit to get feedback
+
+Deploying early also lets real users find bugs you'd never find yourself.
+
+You use the app the same way every time; strangers use it in ways you never expected
+
+# May 20th 2026:
+
+The four Spring Boot Layers:
+
+- Entity maps the database columns to Java fields.
+- Repository is the interface that talks to the databse - contains queries and derived methods
+- Service holds the business logic and methods
+- Controller handles HTTP requests and calls the service
+  Each layer has one job and depends only on the layer below it

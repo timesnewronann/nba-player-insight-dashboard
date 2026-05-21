@@ -37,6 +37,7 @@ if not db_host or not db_name or not db_user or not db_password:
 # -------------------------
 
 # Using 2024-2025 season because the stats are already complete
+
 season_to_load = "2025-26"
 
 
