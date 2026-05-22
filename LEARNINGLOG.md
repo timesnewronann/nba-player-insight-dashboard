@@ -1659,3 +1659,10 @@ The four Spring Boot Layers:
 1. GET /api/teams - returns all 30 teams
 2. GET /api/teams/{id} - returns one team
 3. GET /api/teams/{id}/players - returns all players on a team
+
+# How to fetch data when a component loads
+
+useState stores the result
+useEffect triggers the fetch
+
+useEffect with an empty array [] runs once on mount

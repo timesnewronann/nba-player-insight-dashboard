@@ -7,6 +7,9 @@ from dotenv import load_dotenv
 # Static NBA data helpers for teams and players
 from nba_api.stats.static import players, teams
 
+from nba_api.stats.endpoints import teaminfocommon
+
+import time
 # PostgreSQL driver for Python
 import psycopg2
 
@@ -83,6 +86,10 @@ try:
                 None,  # division is not provided by teams.get_teams()
             ),
         )
+
+    # Need to get the team conference and team division
+    for team in team_rows:
+        teaminfocommon.TeamInfoCommon(team_id=nba_team_id)
 
     # -------------------------
     # STEP 2: LOAD PLAYERS
