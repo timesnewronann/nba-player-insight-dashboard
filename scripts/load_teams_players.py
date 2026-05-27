@@ -89,7 +89,26 @@ try:
 
     # Need to get the team conference and team division
     for team in team_rows:
-        teaminfocommon.TeamInfoCommon(team_id=nba_team_id)
+        try:
+            team_info = teaminfocommon.TeamInfoCommon(team_id=team["id"])
+            time.sleep(1)
+        except Exception as e:
+            print(f"Skipping team {team['id']} due to error: {e}")
+            continue
+        info = team_info.get_data_frames()[0].iloc[0]
+        conference = info["TEAM_CONFERENCE"]
+        division = info["TEAM_DIVISION"]
+
+        cursor.execute(
+            """
+            UPDATE teams
+            SET conference = %s,
+                division = %s
+            WHERE nba_team_id = %s
+            """,
+            (conference, division, team["id"])
+
+        )
 
     # -------------------------
     # STEP 2: LOAD PLAYERS
@@ -100,6 +119,7 @@ try:
 
     # Insert or update each player
     for player in player_rows:
+
         cursor.execute(
             """
             INSERT INTO players (
