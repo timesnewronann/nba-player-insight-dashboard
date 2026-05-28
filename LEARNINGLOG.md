@@ -1684,3 +1684,42 @@ useEffect( () => {...}); - runs everytime the component re-renders
 No array at all means "run after every render." This can cause infinite loops if the effect itself triggers a re-render.
 
 useEffect(() => { ... }, [playerId]) — runs once on load AND again whenever playerId changes. This is useful when you need to re-fetch data if a prop changes.
+
+## Shot Charts ETL file
+
+What do you need to build first before the API loop?
+
+- need to read database configuration from env variables, open a connection to postgres and a cursor so we can execute sql, get all the players and load the players from the nba_api
+  What does the API call look like — what parameters does ShotChartDetail require?
+- What do you need to translate before inserting?
+  What's the INSERT look like?
+
+Player lookup — nba_player_id → db_player_id
+Player's NBA team id — needed for the API call
+Game lookup — nba_game_id → db_game_id to translate game ids for the foreign key
+
+Need player lookup 
+
+Need three lookup queries within the try block
+
+Query 1 — active players with their internal id, nba_player_id, AND nba_team_id (you need all three):
+
+```
+SELECT id, nba_player_id, team_id
+FROM players
+WHERE active = TRUE AND team_id IS NOT NULL
+```
+
+Note team_id IS NOT NULL — you can't call the shot chart API without a team id, so skip players without one.
+
+Query 2 — teams to translate internal team_id to nba_team_id:
+
+```
+SELECT id, nba_team_id FROM teams
+```
+
+Query 3 — games to translate nba_game_id to internal game_id:
+
+```
+SELECT id, nba_game_id FROM games
+```

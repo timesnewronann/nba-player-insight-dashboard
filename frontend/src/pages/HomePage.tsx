@@ -39,7 +39,7 @@ function HomePage() {
             {players.length > 0 && (
                 <div className="w-full max-w-sm bg-fg-bg3 border border-white/10 rounded mt-1">
                     {players.map((player) => (
-                        <Link to={`/player/${player.id}`}
+                        <Link to={`/players/${player.id}`}
                          key={player.id}
                          className="block px-4 py-3 text-fg-text hover:bg-fg-accent/10 hover:text-fg-accent border-b border-white/5 last:border-0 transition-colors"
                         >
