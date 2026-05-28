@@ -31,22 +31,19 @@ export default function TeamsPage() {
             <div className="bg-fg-bg2 border border-white/10 rounded-lg overflow-hidden">
                 <h2 className="font-mono text-xs text-fg-muted uppercase tracking-widest p-4 border-b border-white/10">Eastern Conference</h2>
                 {eastTeams.map((team) => (
-                    <div className="block px-4 py-3 text-fg-text hover:bg-fg-accent/10 hover:text-fg-accent border-b border-white/5 transition-colors">
-                        <Link to={`/teams/${team.id}`} key={team.id} className="block px-4 py-3 text-fg-text hover:bg-fg-accent/10 hover:text-fg-accent border-b border-white/5 transition-colors">
-                            {team.teamName}
-                        </Link>
-                    </div>
+                    <Link to={`/teams/${team.id}`} key={team.id} className="block px-4 py-3 text-fg-text hover:bg-fg-accent/10 hover:text-fg-accent border-b border-white/5 transition-colors">
+                        {team.teamName}
+                    </Link>
+        
                 ))}
             </div>
             <div className="bg-fg-bg2 border border-white/10 rounded-lg overflow-hidden">
             {/* West Column */}
                 <h2 className="font-mono text-xs text-fg-muted uppercase tracking-widest p-4 border-b border-white/10">Western Conference</h2>
                 {westTeams.map((team) => (
-                    <div className="block px-4 py-3 text-fg-text hover:bg-fg-accent/10 hover:text-fg-accent border-b border-white/5 transition-colors">
                     <Link to={`/teams/${team.id}`} key={team.id} className="block px-4 py-3 text-fg-text hover:bg-fg-accent/10 hover:text-fg-accent border-b border-white/5 transition-colors">
-                        {team.teamName}
+                    {team.teamName}
                     </Link>
-                    </div>
                 ))}
             </div>
         </div>

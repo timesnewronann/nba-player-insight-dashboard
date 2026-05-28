@@ -30,19 +30,25 @@ export default function TeamPage() {
     )
     
     return (
-        <div>
-            <h1>{team.teamName}</h1>
-            <h2>{team.city}</h2>
-            <h2>{team.conference}</h2>
-            <h2>{team.division}</h2>
+        <div className="max-w-3xl mx-auto px-4 py-8"> {/* Outer Container */}
+            <div className="bg-fg-bg2 border border-white/10 rounded-lg p-6 mb-4"> {/* Team Header */}
+                <h1 className="font-display text-5xl text-fg-text">{team.teamName}</h1>
+                <div className="flex gap-4 mt-2 text-sm text-fg-muted">
+                    <span>{team.city}</span>
+                    <span>{team.conference}</span>
+                    <span>{team.division}</span>
+                </div>
+            </div>
 
-            <h1>Roster</h1>
-            {players.map((player) => (
-                <Link to={`/teams/${team.id}/players`} key={team.id}>
-                    
-                    <Link to={`/players/${player.id}`}>{player.fullName} - {player.position}</Link>
-                </Link>
-            ))}
+
+            <h1 className="font-mono text-xl text-fg-text uppercase tracking-widest mb-4">Roster</h1>
+            <div className="bg-fg-bg2 border border-white/10 rounded-lg overflow-hidden">
+                {players.map((player) => (
+                    <Link to={`/players/${player.id}`} key={player.id} className="block px-4 py-3 text-fg-text hover:bg-fg-accent/10 hover:text-fg-accent border-b border-white/5 transition-colors">
+                        {player.fullName} - {player.position}
+                    </Link>
+                ))}
+            </div>
         </div>
     )
 }
