@@ -1673,6 +1673,14 @@ Created the TeamPage and TeamsPage pages today
 
 Created the Team functions in the backend and in the PlayerService.ts file
 
-Created the routes within App.tsx for the teams 
+Created the routes within App.tsx for the teams
 
-Linked the teams page to the Navbar 
+Linked the teams page to the Navbar
+
+useEffect( () => {...}, []); - runs once when the component first loads.
+Empty array means "no dependencies, never rerun"
+
+useEffect( () => {...}); - runs everytime the component re-renders
+No array at all means "run after every render." This can cause infinite loops if the effect itself triggers a re-render.
+
+useEffect(() => { ... }, [playerId]) — runs once on load AND again whenever playerId changes. This is useful when you need to re-fetch data if a prop changes.
