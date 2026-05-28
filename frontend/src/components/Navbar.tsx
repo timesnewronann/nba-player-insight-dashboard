@@ -9,7 +9,7 @@ function Navbar() {
             </div>
             <div className="flex gap-8">
                 <Link to="/" className="text-fg-muted hover:text-fg-text text-xs tracking-widest uppercase transition-colors cursor-pointer">Players</Link>
-                <Link to="/" className="text-fg-muted hover:text-fg-text text-xs tracking-widest uppercase transition-colors cursor-pointer">Teams</Link>
+                <Link to="/teams" className="text-fg-muted hover:text-fg-text text-xs tracking-widest uppercase transition-colors cursor-pointer">Teams</Link>
                 <Link to="/" className="text-fg-muted hover:text-fg-text text-xs tracking-widest uppercase transition-colors cursor-pointer">Stats</Link>
             </div>
             <button>
