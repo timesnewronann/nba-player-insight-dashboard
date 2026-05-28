@@ -1666,3 +1666,13 @@ useState stores the result
 useEffect triggers the fetch
 
 useEffect with an empty array [] runs once on mount
+
+## May 27th 2026:
+
+Created the TeamPage and TeamsPage pages today
+
+Created the Team functions in the backend and in the PlayerService.ts file
+
+Created the routes within App.tsx for the teams 
+
+Linked the teams page to the Navbar 
