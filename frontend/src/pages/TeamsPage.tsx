@@ -24,20 +24,32 @@ export default function TeamsPage() {
     const eastTeams = teams.filter(team => team.conference === 'East')
     const westTeams = teams.filter(team => team.conference === 'West')
     return (
-    <div>
-        <h1>Teams</h1>
-        <h2>Eastern Conference</h2>
-        {eastTeams.map((team) => (
-            <Link to={`/teams/${team.id}`} key={team.id}>
-                {team.teamName}
-            </Link>
-        ))}
-        <h2>Western Conference</h2>
-        {westTeams.map((team) => (
-            <Link to={`/teams/${team.id}`} key={team.id}>
-                {team.teamName}
-            </Link>
-        ))}
+    <div className="max-w-5xl mx-auto px-4 py-8">
+        <h1 className="font-display text-5xl text-fg-text mb-6">Teams</h1>
+        <div className="grid grid-cols-2 gap-8 mt-6">
+            {/* East Column */}
+            <div className="bg-fg-bg2 border border-white/10 rounded-lg overflow-hidden">
+                <h2 className="font-mono text-xs text-fg-muted uppercase tracking-widest p-4 border-b border-white/10">Eastern Conference</h2>
+                {eastTeams.map((team) => (
+                    <div className="block px-4 py-3 text-fg-text hover:bg-fg-accent/10 hover:text-fg-accent border-b border-white/5 transition-colors">
+                        <Link to={`/teams/${team.id}`} key={team.id} className="block px-4 py-3 text-fg-text hover:bg-fg-accent/10 hover:text-fg-accent border-b border-white/5 transition-colors">
+                            {team.teamName}
+                        </Link>
+                    </div>
+                ))}
+            </div>
+            <div className="bg-fg-bg2 border border-white/10 rounded-lg overflow-hidden">
+            {/* West Column */}
+                <h2 className="font-mono text-xs text-fg-muted uppercase tracking-widest p-4 border-b border-white/10">Western Conference</h2>
+                {westTeams.map((team) => (
+                    <div className="block px-4 py-3 text-fg-text hover:bg-fg-accent/10 hover:text-fg-accent border-b border-white/5 transition-colors">
+                    <Link to={`/teams/${team.id}`} key={team.id} className="block px-4 py-3 text-fg-text hover:bg-fg-accent/10 hover:text-fg-accent border-b border-white/5 transition-colors">
+                        {team.teamName}
+                    </Link>
+                    </div>
+                ))}
+            </div>
+        </div>
     </div>
     )
 }
