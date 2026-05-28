@@ -26,4 +26,6 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
                 OR LOWER(p.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
             """)
     List<Player> searchPlayers(@Param("searchTerm") String searchTerm);
+
+    List<Player>findPlayerByTeamId(Long teamId);
 }

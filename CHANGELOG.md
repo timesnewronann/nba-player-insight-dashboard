@@ -16,6 +16,40 @@ Added
 
 Fixed
 
+## [1.0.8] - 05-21-2026
+
+### Added
+
+- React + TypeScript frontend with Vite
+- Tailwind CSS v4 with custom FloorGeneral color palette and fonts via @theme
+- HomePage with hero section, real-time player search dropdown, hover states
+- PlayerPage with player photo from NBA CDN, photo lightbox modal
+- Season stats grid showing PPG, RPG, APG, FG% for most reason season
+- Game logs with W/L badges, real game dates, smart FG % coloring relative to season average
+- Navbar with FloorGeneral branding and nav links
+- React Router with routes for / and /player/:id
+- PlayerService.ts with searchPlayers, getPlayerById, getSeasonStats, getGameLogs
+- TypeScript types mirroring all Java entities: Player, Team, Game, SeasonStat, GameLog
+- CORS configuration in Spring Boot to allow requests from localhost:5173
+- Environment variable VITE_API_URL for configurable API endpoint
+- TeamRepository, TeamService, TeamController with GET /api/teams endpoints
+- GET /api/teams, GET /api/teams/:id, GET /api/teams/:id/players endpoints
+- load_player_details.py ETL script to populate position, height, weight, team_id for active players
+- 2025-26 season stats and game logs data ingested
+
+### Changed
+
+- PlayerSeasonStatRepository now orders by season descending
+- PlayerGameStatRepository now orders by game date descending with NULLS last
+- load_player_game_logs.py updated to populate game dates and home/away team ids
+- Game log opponent label now shows real game date instead of season string
+
+### Fixed
+
+- Game log date timezone issue fixed with T12:00:00 local time parsing
+- FG% coloring now compares agaisnt player season average instead of fixed 50% threshold
+- Season stats now correctly show most reason season first
+
 ## [1.0.7] - 04-27-2026
 
 ## Added
