@@ -1733,3 +1733,6 @@ Also shot_type was varchar(3) but the actual value was 2pt field goal
 Always check API response values before defining column widths
 
 D3 scale functions map data coordinates to pixel positions using .domain() for input range and .range() for output range
+
+REST nested resource pattern: URL structure reflects data ownership. /api/players/{id}/shots means shots belonging to a player.
+The parent resource always comes first in the path.
