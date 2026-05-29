@@ -2,7 +2,6 @@ package com.timesnewronan.hoopiq_api.entity;
 
 import jakarta.persistence.*;
 
-import java.sql.Date;
 // needed for game date
 import java.time.LocalDate;
 
@@ -22,12 +21,14 @@ public class ShotChart {
     private Long id;
 
     // Maps the field playerId to the DB column player_id
-    @Column(name = "player_id", nullable = false, unique = true)
-    private Integer playerId;
+    @ManyToOne
+    @JoinColumn(name = "player_id", nullable = false)
+    private Player player;
 
     // Maps the field gameId to the DB column game_id
-    @Column(name = "game_id", nullable = false, unique = true)
-    private Integer gameId;
+    @ManyToOne
+    @JoinColumn(name = "game_id", nullable = false)
+    private Game game;
 
     @Column(name = "loc_x", nullable = false)
     private Integer locX;
@@ -56,11 +57,84 @@ public class ShotChart {
         return id;
     }
 
-    // getter to get the player_id
-    public Integer getPlayerId() {
-        return playerId;
+    // getter to get the player
+    public Player getPlayer() {
+        return player;
     }
 
-    public 
+    // setter to set the player_id
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    // getter to get the game id
+    public Game getGame() {
+        return game;
+    }
+
+    // setter to set the game id
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    // getter to get loc_x
+    public Integer getLocX() {
+        return locX;
+    }
+
+    // setter to set loc_x
+    public void setLocX(Integer locX) {
+        this.locX = locX;
+    }
+
+    // getter to get loc_y
+    public Integer getLocY() {
+        return locY;
+    }
+
+    // setter to set loc_y
+    public void setLocY(Integer locY) {
+        this.locY = locY;
+    }
+
+    // getter to get shot_made
+    public Boolean getShotMade() {
+        return shotMade;
+    }
+
+    // setter to set shot_made
+    public void setShotMade(Boolean shotMade) {
+        this.shotMade = shotMade;
+    }
+
+    // getter to get shot type
+    public String getShotType() {
+        return shotType;
+    }
+
+    // setter to set shot type
+    public void setShotType(String shotType) {
+        this.shotType = shotType;
+    }
+
+    // getter to get shot zone
+    public String getShotZone() {
+        return shotZone;
+    }
+
+    // setter to set shot zone
+    public void setShotZone(String shotZone) {
+        this.shotZone = shotZone;
+    }
+
+    // getter to get game date
+    public LocalDate getGameDate() {
+        return gameDate;
+    }
+
+    // setter to set game Date
+    public void setGameDate(LocalDate gameDate) {
+        this.gameDate = gameDate;
+    }
 
 }
