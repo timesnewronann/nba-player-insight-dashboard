@@ -168,7 +168,8 @@ try:
             shot_chart_response = shotchartdetail.ShotChartDetail(
                 player_id=nba_player_id,
                 team_id=nba_team_id,
-                season_nullable=season_to_load
+                season_nullable=season_to_load,
+                context_measure_simple="FGA"
             )
 
             time.sleep(1)
@@ -184,11 +185,7 @@ try:
         # for each shot:
         for _, row in shot_chart_df.iterrows():
             nba_game_id = int(row["GAME_ID"])
-            # note uppercase
-            # print(
-            #     f"Looking up game id: {nba_game_id}, found: {nba_game_id_to_db_game_id.get(nba_game_id)}")
-            # print(f"Sample SHOT_TYPE: {shot_chart_df['SHOT_TYPE'].iloc[0]}")
-            # db_game_id = nba_game_id_to_db_game_id.get(nba_game_id)
+            db_game_id = nba_game_id_to_db_game_id.get(nba_game_id)
             if not db_game_id:
                 skipped_count += 1
                 continue
@@ -196,15 +193,16 @@ try:
             cursor.execute(
                 """
                 INSERT INTO shot_chart (
-                    player_id, game_id, loc_x, loc_y,
+                    player_id, game_id, game_event_id, loc_x, loc_y,
                     shot_made, shot_type, shot_zone, game_date
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (player_id, game_id, loc_x, loc_y) DO NOTHING
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (player_id, game_id, game_event_id) DO NOTHING
                 """,
                 (
                     db_player_id,
                     db_game_id,
+                    int(row["GAME_EVENT_ID"]),
                     row["LOC_X"],
                     row["LOC_Y"],
                     bool(row["SHOT_MADE_FLAG"]),

@@ -1791,3 +1791,7 @@ shots: ShotChart[] says this component requires an array of ShotChart objects
 Same concept as Java method parameters - define what types a method accepts.
 In React components you define what data they accept via props
 
+selectAll("circle.shot") - selects all existing circles with class "shot" (empty at first)
+.data(shots) binds shots array to that selection
+.enter() creates a placeholder for each data point that doesn't have a circle yet
+.append("circle") creates an actual circle for each placeholder

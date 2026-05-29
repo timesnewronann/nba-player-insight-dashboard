@@ -27,7 +27,7 @@ export default function ShotChartComponent({shots}: Props) {
 
         // Scale functions
         const xScale = d3.scaleLinear().domain([-250, 250]).range([0, width])
-        const yScale = d3.scaleLinear().domain([-50, 420]).range([0, height])
+        const yScale = d3.scaleLinear().domain([420, -50]).range([0, height])
 
         // Draw court outline 
         svg.append("rect")
@@ -37,6 +37,71 @@ export default function ShotChartComponent({shots}: Props) {
             .attr("stroke", "#C8A96E").attr("stroke-width", 1).attr("opacity", 0.4)
         
         // Draw the basket
+        svg.append("circle")
+            .attr("cx", xScale(0)).attr("cy", yScale(0))
+            .attr("r", 7.5)
+            .attr("fill", "none")
+            .attr("stroke", "#C8A96E").attr("stroke-width", 1.5).attr("opacity", 0.6)
+
+        // Draw the paint (key)
+        svg.append("rect")
+            .attr("x", xScale(-80))
+            .attr("y", Math.min(yScale(-50), yScale(140)))
+            .attr("width", xScale(80) - xScale(-80))
+            .attr("height", Math.abs(yScale(140) - yScale(-50)))
+            .attr("fill", "none")
+            .attr("stroke", "#C8A96E").attr("stroke-width", 1).attr("opacity", 0.3)
+
+        // Free throw circle
+        svg.append("circle")
+            .attr("cx", xScale(0)).attr("cy", yScale(140))
+            .attr("r", xScale(60) - xScale(0))
+            .attr("fill", "none")
+            .attr("stroke", "#C8A96E").attr("stroke-width", 1).attr("opacity", 0.3)
+
+        // Corner three lines - left
+        svg.append("line")
+            .attr("x1", xScale(-220)).attr("y1", yScale(-50))
+            .attr("x2", xScale(-220)).attr("y2", yScale(90))
+            .attr("stroke", "#C8A96E").attr("stroke-width", 1).attr("opacity", 0.3)
+
+        // Corner three lines - right  
+        svg.append("line")
+            .attr("x1", xScale(220)).attr("y1", yScale(-50))
+            .attr("x2", xScale(220)).attr("y2", yScale(90))
+            .attr("stroke", "#C8A96E").attr("stroke-width", 1).attr("opacity", 0.3)
+        
+        // Draw the three point line
+        const arc = d3.arc()
+            .innerRadius(0)
+            .outerRadius(xScale(238) - xScale(0))
+            .startAngle(-Math.PI / 2)
+            .endAngle(Math.PI / 2)
+        
+        svg.append("path")
+            .attr("d", arc as any)
+            .attr("transform", `translate(${xScale(0)}, ${yScale(0)})`)
+            .attr("fill", "none")
+            .attr("stroke", "#C8A96E").attr("stroke-width", 1).attr("opacity", 0.3)
+        
+        // Plot Shot Dots
+        svg.selectAll("circle.shot")
+            .data(shots)
+            .enter()
+            .append("circle")
+            .attr("class", "shot")
+            .attr("cx", d => xScale(d.locX))
+            .attr("cy", d => yScale(d.locY))
+            .attr("r", 3)
+            .attr("fill", d => d.shotMade ? "#4ADE80" : "#FF4D00")
+            .attr("opacity", d => d.shotMade ? 0.8 : 0.6)
+        
+        const madeCount = shots.filter(s => s.shotMade).length
+        const missedCount = shots.filter(s => !s.shotMade).length
+        console.log(`Made: ${madeCount}, Missed: ${missedCount}`)
+
+
+
     }, [shots])
 
     return (
