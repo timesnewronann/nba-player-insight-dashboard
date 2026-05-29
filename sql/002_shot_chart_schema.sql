@@ -5,7 +5,7 @@ CREATE TABLE shot_chart (
     loc_x INTEGER NOT NULL,
     loc_y INTEGER NOT NULL,
     shot_made BOOLEAN NOT NULL,
-    shot_type VARCHAR(3) NOT NULL,
+    shot_type VARCHAR(50) NOT NULL,
     shot_zone VARCHAR(50) NOT NULL,
     game_date DATE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

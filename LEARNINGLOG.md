@@ -1698,7 +1698,7 @@ Player lookup — nba_player_id → db_player_id
 Player's NBA team id — needed for the API call
 Game lookup — nba_game_id → db_game_id to translate game ids for the foreign key
 
-Need player lookup 
+Need player lookup
 
 Need three lookup queries within the try block
 
@@ -1723,3 +1723,13 @@ Query 3 — games to translate nba_game_id to internal game_id:
 ```
 SELECT id, nba_game_id FROM games
 ```
+
+# May 28th 2026
+
+Debugging ETL Data Type Mismatches
+API returned GAME_ID as a string but the database stores it as an integer
+Converting with int() stripped the leading zeros and fixed the lookup
+Also shot_type was varchar(3) but the actual value was 2pt field goal
+Always check API response values before defining column widths
+
+D3 scale functions map data coordinates to pixel positions using .domain() for input range and .range() for output range
