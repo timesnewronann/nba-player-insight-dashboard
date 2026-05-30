@@ -147,9 +147,11 @@ export default function PlayerPage() {
                     </div>
                 ))}
             </div>
-            <div> {/* Shot Chart */}
-                <h2>Shot Chart</h2>
-                <ShotChartComponent shots={shotChart} />
+            <div className="mt-6">
+                <h2 className="font-mono text-xl text-fg-text uppercase tracking-widest mb-4">Shot Chart</h2>
+                 <div className="bg-fg-bg2 border border-white/10 rounded-lg p-6 flex justify-center"> {/* Shot Chart */}
+                    <ShotChartComponent shots={shotChart} />
+                </div>
             </div>
             
         </div>
