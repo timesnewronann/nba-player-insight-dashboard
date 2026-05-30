@@ -1684,3 +1684,117 @@ useEffect( () => {...}); - runs everytime the component re-renders
 No array at all means "run after every render." This can cause infinite loops if the effect itself triggers a re-render.
 
 useEffect(() => { ... }, [playerId]) — runs once on load AND again whenever playerId changes. This is useful when you need to re-fetch data if a prop changes.
+
+## Shot Charts ETL file
+
+What do you need to build first before the API loop?
+
+- need to read database configuration from env variables, open a connection to postgres and a cursor so we can execute sql, get all the players and load the players from the nba_api
+  What does the API call look like — what parameters does ShotChartDetail require?
+- What do you need to translate before inserting?
+  What's the INSERT look like?
+
+Player lookup — nba_player_id → db_player_id
+Player's NBA team id — needed for the API call
+Game lookup — nba_game_id → db_game_id to translate game ids for the foreign key
+
+Need player lookup
+
+Need three lookup queries within the try block
+
+Query 1 — active players with their internal id, nba_player_id, AND nba_team_id (you need all three):
+
+```
+SELECT id, nba_player_id, team_id
+FROM players
+WHERE active = TRUE AND team_id IS NOT NULL
+```
+
+Note team_id IS NOT NULL — you can't call the shot chart API without a team id, so skip players without one.
+
+Query 2 — teams to translate internal team_id to nba_team_id:
+
+```
+SELECT id, nba_team_id FROM teams
+```
+
+Query 3 — games to translate nba_game_id to internal game_id:
+
+```
+SELECT id, nba_game_id FROM games
+```
+
+# May 28th 2026
+
+Debugging ETL Data Type Mismatches
+API returned GAME_ID as a string but the database stores it as an integer
+Converting with int() stripped the leading zeros and fixed the lookup
+Also shot_type was varchar(3) but the actual value was 2pt field goal
+Always check API response values before defining column widths
+
+D3 scale functions map data coordinates to pixel positions using .domain() for input range and .range() for output range
+
+REST nested resource pattern: URL structure reflects data ownership. /api/players/{id}/shots means shots belonging to a player.
+The parent resource always comes first in the path.
+
+# May 29th 2026
+
+D3 = Data Driven Documents
+JavaScript library that binds data to SVG elements
+Instead of drawing shapes manually, you tell d3 "here's my data, here's my SVG container, map the data to circles."
+
+Shot chart needs:
+
+1. Input data - ShotChart[] array. Each shot has locX, locY, shotMade
+
+2. The court - draw a basketball court as SVG lines and arcs first. The court is a collection of <line> <rect>, and <path> elements
+   The NBA coordinate system is 500 units wide (-250, 250) and ~470 units tall
+
+3. Scales - two d3 scale functions that translate NBA coordinates to pixel positions:
+
+```
+const xScale = d3.scaleLinear().domain([-250, 250]).range([0, width])
+const yScale = d3.scaleLinear().domain([-50, 420]).range([0, height])
+```
+
+4. Shot dots - for each shot, draw a circle at xSCale(shot.locX), yScale(shot.locY)
+
+Color it orange if made, gray if missed
+
+Now - React and d3 can conflict because both want to control the DOM. The clean React approach uses useRef to give d3 a container to draw into, and useEffect to run the d3 code after React renders
+
+useRef - creates a reference to a DOM element - allows you to grab the actual HTML element so d3 can draw inside it
+
+` const svgRef = useRef<SVGSCGElement>(null)`
+
+In JSX:
+`<svg ref={svgRef} width={500} height={470}/>`
+
+useEffect, d3 can access the actual svg element
+
+`const svg = d3.select(svgRef.current)`
+
+We give d3 a canvas to paint on. React renders the empty <svg> element, then d3 fills it with the court lines and shot dots
+
+The full flow is:
+
+1. React renders <svg ref={svgRef} />
+2. useEffect runs after render
+3. d3 grabs the SVG via svgRef.current
+4. d3 draws court lines
+5. d3 plots shot dots using scales
+
+Interface Props: defines the shape of what the component expects to receive like a contract
+shots: ShotChart[] says this component requires an array of ShotChart objects
+{shots}: props is destructuring - it puls shots out of the props object so you can use it directly instead of writing props.shots everywhere
+
+Same concept as Java method parameters - define what types a method accepts.
+In React components you define what data they accept via props
+
+selectAll("circle.shot") - selects all existing circles with class "shot" (empty at first)
+.data(shots) binds shots array to that selection
+.enter() creates a placeholder for each data point that doesn't have a circle yet
+.append("circle") creates an actual circle for each placeholder
+
+Lifting state up: When a child component needs state that a parent controls, put the state in the parent and pass it down as props
+

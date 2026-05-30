@@ -2,15 +2,19 @@ import { useState, useEffect } from "react";
 import type { Player } from "../types/Player";
 import type { SeasonStat } from "../types/SeasonStat";
 import type { GameLog } from "../types/GameLog";
+import type { ShotChart } from "../types/ShotChart";
 import { useParams } from "react-router-dom";
-import { getPlayerById, getGameLogs, getSeasonStats } from "../services/PlayerService";
+import { getPlayerById, getGameLogs, getSeasonStats, getShotsByPlayerId } from "../services/PlayerService";
+import ShotChartComponent from "../components/ShotChartComponent";
 
 export default function PlayerPage() {
     const params = useParams();
     const [player, setPlayer] = useState<Player | null>(null);
     const [seasonStats, setSeasonStats] = useState<SeasonStat[]>([]);
+    const [shotChart, setShotChart] = useState<ShotChart[]>([]);
     const [gameLogs, setGameLogs]= useState<GameLog[]>([])
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [chartMode, setChartMode] = useState<"dots" | "hexbin">("hexbin")
 
     useEffect( () => {
         // fetch code
@@ -26,6 +30,10 @@ export default function PlayerPage() {
             // get game logs
             const gameData = await getGameLogs(Number(params.id));
             setGameLogs(gameData);
+
+            // get shot chart
+            const shotData = await getShotsByPlayerId(Number(params.id));
+            setShotChart(shotData);
             
         }
         fetchData();
@@ -140,10 +148,29 @@ export default function PlayerPage() {
                     </div>
                 ))}
             </div>
-            <div> {/* Shot Chart */}
-                <h2>Shot Chart</h2>
+            <div className="mt-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="font-mono text-xl text-fg-text uppercase tracking-widest">Shot Chart</h2>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setChartMode("hexbin")}
+                            className={`px-3 py-1 text-xs font-mono uppercase tracking-widest rounded border transition-colors ${chartMode === "hexbin" ? "bg-fg-accent text-white border-fg-accent" : "text-fg-muted border-white/20 hover:border-white/40"}`}
+                        >
+                            Zones
+                        </button>
+                        <button
+                            onClick={() => setChartMode("dots")}
+                            className={`px-3 py-1 text-xs font-mono uppercase tracking-widest rounded border transition-colors ${chartMode === "dots" ? "bg-fg-accent text-white border-fg-accent" : "text-fg-muted border-white/20 hover:border-white/40"}`}
+                        >
+                            Dots
+                        </button>
+                    </div>
+                </div>
+                <div className="bg-fg-bg2 border border-white/10 rounded-lg p-6 flex justify-center">
+                    <ShotChartComponent shots={shotChart} mode={chartMode} />
+                </div>
             </div>
-            
+        
         </div>
     )
 
