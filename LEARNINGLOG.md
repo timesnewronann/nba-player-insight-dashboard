@@ -1798,3 +1798,6 @@ selectAll("circle.shot") - selects all existing circles with class "shot" (empty
 
 Lifting state up: When a child component needs state that a parent controls, put the state in the parent and pass it down as props
 
+# May 30th 2026
+
+Built hexbin shot chart with d3-hexbin. Hexbin groups nearby shots into hexagons — size shows volume, color shows efficiency (orange=low, green=high). Toggle between dots and zones using lifted state in PlayerPage. useRef gives d3 access to the SVG DOM element. useEffect with [shots, mode] dependency array rerenders the chart when either changes. Lifting state up: put state in the parent when multiple children need it
