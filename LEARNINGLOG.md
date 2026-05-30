@@ -1795,3 +1795,6 @@ selectAll("circle.shot") - selects all existing circles with class "shot" (empty
 .data(shots) binds shots array to that selection
 .enter() creates a placeholder for each data point that doesn't have a circle yet
 .append("circle") creates an actual circle for each placeholder
+
+Lifting state up: When a child component needs state that a parent controls, put the state in the parent and pass it down as props
+

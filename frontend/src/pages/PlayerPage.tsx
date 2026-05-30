@@ -14,6 +14,7 @@ export default function PlayerPage() {
     const [shotChart, setShotChart] = useState<ShotChart[]>([]);
     const [gameLogs, setGameLogs]= useState<GameLog[]>([])
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [chartMode, setChartMode] = useState<"dots" | "hexbin">("hexbin")
 
     useEffect( () => {
         // fetch code
@@ -148,12 +149,28 @@ export default function PlayerPage() {
                 ))}
             </div>
             <div className="mt-6">
-                <h2 className="font-mono text-xl text-fg-text uppercase tracking-widest mb-4">Shot Chart</h2>
-                 <div className="bg-fg-bg2 border border-white/10 rounded-lg p-6 flex justify-center"> {/* Shot Chart */}
-                    <ShotChartComponent shots={shotChart} />
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="font-mono text-xl text-fg-text uppercase tracking-widest">Shot Chart</h2>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setChartMode("hexbin")}
+                            className={`px-3 py-1 text-xs font-mono uppercase tracking-widest rounded border transition-colors ${chartMode === "hexbin" ? "bg-fg-accent text-white border-fg-accent" : "text-fg-muted border-white/20 hover:border-white/40"}`}
+                        >
+                            Zones
+                        </button>
+                        <button
+                            onClick={() => setChartMode("dots")}
+                            className={`px-3 py-1 text-xs font-mono uppercase tracking-widest rounded border transition-colors ${chartMode === "dots" ? "bg-fg-accent text-white border-fg-accent" : "text-fg-muted border-white/20 hover:border-white/40"}`}
+                        >
+                            Dots
+                        </button>
+                    </div>
+                </div>
+                <div className="bg-fg-bg2 border border-white/10 rounded-lg p-6 flex justify-center">
+                    <ShotChartComponent shots={shotChart} mode={chartMode} />
                 </div>
             </div>
-            
+        
         </div>
     )
 
