@@ -1,5 +1,6 @@
 export type Player = {
   id: number;
+  nbaPlayerId: number;
   firstName: string;
   lastName: string;
   fullName: string;
