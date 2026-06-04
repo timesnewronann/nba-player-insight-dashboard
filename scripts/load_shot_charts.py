@@ -77,31 +77,28 @@ try:
     # STEP 4: BUILD PLAYER ID LOOKUP DICTIONARY
     # -------------------------
 
-    # Translate the nba_player_id into our database's internal player_id
+    # Only fetch players who have game logs but no shot chart data yet
+    # This makes re-runs fast — already-loaded players are skipped entirely
     cursor.execute(
         """
-        SELECT id, nba_player_id, team_id
-        FROM players
-        WHERE active = TRUE AND team_id IS NOT NULL
+        SELECT DISTINCT p.id, p.nba_player_id
+        FROM players p
+        JOIN player_game_logs gl ON p.id = gl.player_id
+        WHERE p.active = TRUE
+          AND NOT EXISTS (SELECT 1 FROM shot_chart sc WHERE sc.player_id = p.id)
         """
     )
 
-    # you cannot call the shot chart api without a team_id
-
-    # get all the active rows
+    # get all the rows for players missing shot data
     active_player_rows = cursor.fetchall()
 
     # use a dictionary to provide fast lookup
     nba_player_id_to_db_player_id = {}
 
-    # build the dictionary
-    for db_player_id, nba_player_id, db_team_id in active_player_rows:
-        # translate the player id key to player_id
-        nba_player_id_to_db_player_id[nba_player_id] = (db_player_id, db_team_id)
+    for db_player_id, nba_player_id in active_player_rows:
+        nba_player_id_to_db_player_id[nba_player_id] = db_player_id
 
-    # Print statement that we were able to successfully map the ids
-    # Print statement that we were able to successfully map the ids
-    print(f"Loaded {len(nba_player_id_to_db_player_id)} player id mappings from the database")
+    print(f"Loaded {len(nba_player_id_to_db_player_id)} players missing shot data")
 
     # -------------------------
     # STEP 4.5: BUILD TEAMS ID LOOKUP DICTIONARY
@@ -154,64 +151,71 @@ try:
     # STEP 5: FETCH SHOT CHART STATS FROM NBA API
 
     # -------------------------
-    # for nba_player_id, (db_player_id, db_team_id) in nba_player_id_to_db_player_id.items():
-    for nba_player_id, (db_player_id, db_team_id) in list(nba_player_id_to_db_player_id.items()):
-        # get the nba_team_id for this player using the teams lookup
-        # hint: db_team_id is your internal team id, but the API needs nba_team_id
-        # how do you translate internal team id to nba_team_id?
-        nba_team_id = db_team_id_to_nba_team_id.get(db_team_id)
-        if not nba_team_id:
-            skipped_count += 1
-            continue
+    total = len(nba_player_id_to_db_player_id)
+    for i, (nba_player_id, db_player_id) in enumerate(nba_player_id_to_db_player_id.items(), 1):
+        print(f"[{i}/{total}] Fetching shots for player {nba_player_id}")
 
-        try:
-            shot_chart_response = shotchartdetail.ShotChartDetail(
-                player_id=nba_player_id,
-                team_id=nba_team_id,
-                season_nullable=season_to_load,
-                context_measure_simple="FGA"
-            )
+        # A player may have been on multiple teams during the season (trades).
+        # The ShotChartDetail API scopes results to one team at a time, so we
+        # call it once per team the player appeared for in our game logs.
+        cursor.execute(
+            """
+            SELECT DISTINCT t.nba_team_id
+            FROM player_game_logs gl
+            JOIN teams t ON gl.team_id = t.id
+            WHERE gl.player_id = %s
+            """,
+            (db_player_id,)
+        )
+        player_team_ids = [row[0] for row in cursor.fetchall()]
 
-            time.sleep(1)
+        for nba_team_id in player_team_ids:
+            try:
+                shot_chart_response = shotchartdetail.ShotChartDetail(
+                    player_id=nba_player_id,
+                    team_id=nba_team_id,
+                    season_nullable=season_to_load,
+                    context_measure_simple="FGA"
+                )
 
-        except Exception as e:
-            print(f"Skipping player {nba_player_id} due to error: {e}")
-            continue
+                time.sleep(1)
 
-        # get the dataframe from the response
-        shot_chart_df = shot_chart_response.get_data_frames()[0]
-
-        # loop through each shot row
-        # for each shot:
-        for _, row in shot_chart_df.iterrows():
-            nba_game_id = int(row["GAME_ID"])
-            db_game_id = nba_game_id_to_db_game_id.get(nba_game_id)
-            if not db_game_id:
-                skipped_count += 1
+            except Exception as e:
+                print(f"  Skipping player {nba_player_id} / team {nba_team_id} due to API error: {e}")
                 continue
 
-            cursor.execute(
-                """
-                INSERT INTO shot_chart (
-                    player_id, game_id, game_event_id, loc_x, loc_y,
-                    shot_made, shot_type, shot_zone, game_date
+            # get the dataframe from the response
+            shot_chart_df = shot_chart_response.get_data_frames()[0]
+
+            for _, row in shot_chart_df.iterrows():
+                nba_game_id = int(row["GAME_ID"])
+                db_game_id = nba_game_id_to_db_game_id.get(nba_game_id)
+                if not db_game_id:
+                    skipped_count += 1
+                    continue
+
+                cursor.execute(
+                    """
+                    INSERT INTO shot_chart (
+                        player_id, game_id, game_event_id, loc_x, loc_y,
+                        shot_made, shot_type, shot_zone, game_date
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (player_id, game_id, game_event_id) DO NOTHING
+                    """,
+                    (
+                        db_player_id,
+                        db_game_id,
+                        int(row["GAME_EVENT_ID"]),
+                        row["LOC_X"],
+                        row["LOC_Y"],
+                        bool(row["SHOT_MADE_FLAG"]),
+                        row["SHOT_TYPE"],
+                        row["SHOT_ZONE_BASIC"],
+                        row["GAME_DATE"]
+                    )
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (player_id, game_id, game_event_id) DO NOTHING
-                """,
-                (
-                    db_player_id,
-                    db_game_id,
-                    int(row["GAME_EVENT_ID"]),
-                    row["LOC_X"],
-                    row["LOC_Y"],
-                    bool(row["SHOT_MADE_FLAG"]),
-                    row["SHOT_TYPE"],
-                    row["SHOT_ZONE_BASIC"],
-                    row["GAME_DATE"]
-                )
-            )
-            inserted_or_updated_count += 1
+                inserted_or_updated_count += 1
         # -------------------------
     # STEP 7: COMMIT CHANGES
     # -------------------------
