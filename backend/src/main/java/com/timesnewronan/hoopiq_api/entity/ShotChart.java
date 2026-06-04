@@ -8,8 +8,11 @@ import java.time.LocalDate;
 // Mark the class as a JPA entity (map to a database table)
 @Entity
 
-// Tell JPA which table maps to shortchart
-@Table(name = "shot_chart")
+// Tell JPA which table maps to shot_chart
+// Composite unique constraint: one row per player per game event
+@Table(name = "shot_chart", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"player_id", "game_id", "game_event_id"})
+})
 
 public class ShotChart {
 
@@ -29,6 +32,10 @@ public class ShotChart {
     @ManyToOne
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
+
+    // Unique event ID for this shot within the game (from NBA API GAME_EVENT_ID)
+    @Column(name = "game_event_id", nullable = false)
+    private Integer gameEventId;
 
     @Column(name = "loc_x", nullable = false)
     private Integer locX;
@@ -75,6 +82,16 @@ public class ShotChart {
     // setter to set the game id
     public void setGame(Game game) {
         this.game = game;
+    }
+
+    // getter to get game event id
+    public Integer getGameEventId() {
+        return gameEventId;
+    }
+
+    // setter to set game event id
+    public void setGameEventId(Integer gameEventId) {
+        this.gameEventId = gameEventId;
     }
 
     // getter to get loc_x

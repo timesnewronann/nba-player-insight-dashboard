@@ -10,7 +10,10 @@ import java.math.BigDecimal;
 @Entity
 
 // Tell JPA that the table maps to player_season_stats
-@Table(name = "player_season_stats")
+// Composite unique constraint: one row per player per season
+@Table(name = "player_season_stats", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"player_id", "season"})
+})
 
 public class PlayerSeasonStat {
     // Mark the field as the primary key

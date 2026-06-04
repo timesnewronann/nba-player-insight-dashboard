@@ -18,7 +18,7 @@ public class Team {
     private Long id;
 
     // nba team id
-    @Column(name = "nba_team_id", nullable = false)
+    @Column(name = "nba_team_id", nullable = false, unique = true)
     private Integer nbaTeamId;
 
     // team name

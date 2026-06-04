@@ -8,7 +8,10 @@ import java.math.BigDecimal;
 @Entity
 
 // Tell JPA that the table maps to player_game_logs
-@Table(name = "player_game_logs")
+// Composite unique constraint: one row per player per game
+@Table(name = "player_game_logs", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"player_id", "game_id"})
+})
 
 public class PlayerGameStat {
     // Mark the field id as the primary key

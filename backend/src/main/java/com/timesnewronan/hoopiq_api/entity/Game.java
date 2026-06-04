@@ -20,7 +20,7 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nba_game_id", nullable = false)
+    @Column(name = "nba_game_id", nullable = false, unique = true)
     private Integer nbaGameId;
 
     @ManyToOne(optional = true)
