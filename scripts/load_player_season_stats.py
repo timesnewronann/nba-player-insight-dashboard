@@ -197,9 +197,6 @@ def load_player_season_stats(season_to_load, connection):
         if cursor is not None:
             cursor.close()
 
-        # Always close the connection if it was created
-        if connection is not None:
-            connection.close()
 
 
 # Direct Run behavior
@@ -213,3 +210,6 @@ if __name__ == "__main__":
         password=db_password,
     )
     load_player_season_stats(season_to_load, connection)
+
+    # close the connection after the function call
+    connection.close()
