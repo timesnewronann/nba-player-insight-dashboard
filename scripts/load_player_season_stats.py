@@ -32,31 +32,179 @@ print(f"db_user: {db_user}")
 if not db_host or not db_name or not db_user or not db_password:
     raise ValueError("Missing one or more required database environment variables.")
 
-# -------------------------
-# STEP 1: CHOOSE THE SEASON WE WANT TO LOAD
-# -------------------------
 
-# Using 2024-2025 season because the stats are already complete
-
-season_to_load = "2025-26"
-
-
-# -------------------------
-# STEP 2: PREP VARIABLES
-# -------------------------
-
-# Start with None so these names exist even if connection setup fails
-connection = None
-cursor = None
-
-# Track what occurred after script runs
-inserted_or_updated_count = 0
-skipped_count = 0
-
-try:
+def load_player_season_stats(season_to_load, connection):
     # -------------------------
-    # STEP 3: CONNECT TO POSTGRES
+    # STEP 1: CHOOSE THE SEASON WE WANT TO LOAD
     # -------------------------
+
+    # Using 2024-2025 season because the stats are already complete
+
+    # season_to_load = "2025-26"
+
+    # -------------------------
+    # STEP 2: PREP VARIABLES
+    # -------------------------
+
+    # Start with None so these names exist even if connection setup fails
+    cursor = None
+
+    # Track what occurred after script runs
+    inserted_or_updated_count = 0
+    skipped_count = 0
+
+    try:
+        # -------------------------
+        # STEP 3: CONNECT TO POSTGRES
+        # -------------------------
+        # Open a cursor so we can execute SQL
+        cursor = connection.cursor()
+
+        # -------------------------
+        # STEP 4: BUILD PLAYER ID LOOKUP
+        # -------------------------
+
+        # Translate NBA player IDs from nba_api into our database's internal player IDs.
+        # Ex:
+        # players.nba_player_id = 203518 -> players.id = 10
+        # Load this mapping into a dictionary to achieve fast lookup
+        cursor.execute(
+            """
+            SELECT id, nba_player_id
+            FROM players
+            """
+        )
+
+        # grab all the rows
+        player_lookup_rows = cursor.fetchall()
+
+        # use a dictionary for fast lookup
+        nba_player_id_to_db_player_id = {}
+
+        # build the dictionary
+        for db_player_id, nba_player_id in player_lookup_rows:
+            # translate the player id key -> value is our db player_id
+            nba_player_id_to_db_player_id[nba_player_id] = db_player_id
+
+        # print statement to check that we successfully mapped the ids
+        print(f"Loaded {len(nba_player_id_to_db_player_id)} player id mappings from the database.")
+
+        # -------------------------
+        # STEP 5: FETCH SEASON STATS FROM NBA API
+        # -------------------------
+
+        # This endpoint gives us player season stats across the league for the selected season.
+        # Request PerGame stats because our database columns are per-game fields:
+        # ex: points_per_game and minutes_per_game
+        season_stats_response = leaguedashplayerstats.LeagueDashPlayerStats(
+            season=season_to_load,
+            per_mode_detailed="PerGame"
+        )
+
+        # Convert the response into a pandas dataframe to access the row easier
+        season_stats_dataframe = season_stats_response.get_data_frames()[0]
+
+        print(
+            f"Fetched {len(season_stats_dataframe)} season stat rows from nba_api for {season_to_load}.")
+
+        # -------------------------
+        # STEP 6: LOOP THROUGH EACH STATS ROW
+        # -------------------------
+        for _, row in season_stats_dataframe.iterrows():
+            nba_player_id = row["PLAYER_ID"]
+
+            # If the NBA player id is not in our local players table, skip it.
+            # Protects from inserting orphaned season stats rows
+            if nba_player_id not in nba_player_id_to_db_player_id:
+                skipped_count += 1
+                continue
+
+            # Get the internal database player id
+            db_player_id = nba_player_id_to_db_player_id[nba_player_id]
+
+            # Insert the season stats row into our table.
+            # ON CONFLICT makes the script able to be reran
+            cursor.execute(
+                """
+                INSERT INTO player_season_stats (
+                    player_id,
+                    season,
+                    games_played,
+                    minutes_per_game,
+                    points_per_game,
+                    rebounds_per_game,
+                    assists_per_game,
+                    steals_per_game,
+                    blocks_per_game,
+                    field_goal_pct,
+                    three_point_pct,
+                    free_throw_pct
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (player_id, season)
+                DO UPDATE SET
+                    games_played = EXCLUDED.games_played,
+                    minutes_per_game = EXCLUDED.minutes_per_game,
+                    points_per_game = EXCLUDED.points_per_game,
+                    rebounds_per_game = EXCLUDED.rebounds_per_game,
+                    assists_per_game = EXCLUDED.assists_per_game,
+                    steals_per_game = EXCLUDED.steals_per_game,
+                    blocks_per_game = EXCLUDED.blocks_per_game,
+                    field_goal_pct = EXCLUDED.field_goal_pct,
+                    three_point_pct = EXCLUDED.three_point_pct,
+                    free_throw_pct = EXCLUDED.free_throw_pct
+                """,
+                (
+                    db_player_id,
+                    season_to_load,
+                    row["GP"],       # Games Played
+                    row["MIN"],      # Minutes Per Game
+                    row["PTS"],      # Points Per Game
+                    row["REB"],      # Rebounds Per Game
+                    row["AST"],      # Assists Per Game
+                    row["STL"],      # Steals Per Game
+                    row["BLK"],      # Blocks Per Game
+                    row["FG_PCT"],   # Field Goal Percentage
+                    row["FG3_PCT"],  # Three Point Percentage
+                    row["FT_PCT"],   # Free Throw Percentage
+                ),
+            )
+
+            # increment the inserted or updated counter
+            inserted_or_updated_count += 1
+
+        # -------------------------
+        # STEP 7: COMMIT CHANGES
+        # -------------------------
+
+        connection.commit()
+
+        print(f"Inserted or updated {inserted_or_updated_count} player season stat rows.")
+        print(
+            f"Skipped {skipped_count} rows because no matching player was found in the local database.")
+
+    except Exception as error:
+        # Roll back the current transaction if something fails
+        if connection is not None:
+            connection.rollback()
+
+        # Show the error so we know what went wrong
+        print(f"Season stats ETL script failed: {error}")
+        raise
+
+    finally:
+        # Always close the cursor if it was created
+        if cursor is not None:
+            cursor.close()
+
+        # Always close the connection if it was created
+        if connection is not None:
+            connection.close()
+
+
+# Direct Run behavior
+if __name__ == "__main__":
+    season_to_load = "2025-26"
     connection = psycopg2.connect(
         host=db_host,
         port=db_port,
@@ -64,145 +212,4 @@ try:
         user=db_user,
         password=db_password,
     )
-
-    # Open a cursor so we can execute SQL
-    cursor = connection.cursor()
-
-    # -------------------------
-    # STEP 4: BUILD PLAYER ID LOOKUP
-    # -------------------------
-
-    # Translate NBA player IDs from nba_api into our database's internal player IDs.
-    # Ex:
-    # players.nba_player_id = 203518 -> players.id = 10
-    # Load this mapping into a dictionary to achieve fast lookup
-    cursor.execute(
-        """
-        SELECT id, nba_player_id
-        FROM players
-        """
-    )
-
-    # grab all the rows
-    player_lookup_rows = cursor.fetchall()
-
-    # use a dictionary for fast lookup
-    nba_player_id_to_db_player_id = {}
-
-    # build the dictionary
-    for db_player_id, nba_player_id in player_lookup_rows:
-        # translate the player id key -> value is our db player_id
-        nba_player_id_to_db_player_id[nba_player_id] = db_player_id
-
-    # print statement to check that we successfully mapped the ids
-    print(f"Loaded {len(nba_player_id_to_db_player_id)} player id mappings from the database.")
-
-    # -------------------------
-    # STEP 5: FETCH SEASON STATS FROM NBA API
-    # -------------------------
-
-    # This endpoint gives us player season stats across the league for the selected season.
-    # Request PerGame stats because our database columns are per-game fields:
-    # ex: points_per_game and minutes_per_game
-    season_stats_response = leaguedashplayerstats.LeagueDashPlayerStats(
-        season=season_to_load,
-        per_mode_detailed="PerGame"
-    )
-
-    # Convert the response into a pandas dataframe to access the row easier
-    season_stats_dataframe = season_stats_response.get_data_frames()[0]
-
-    print(f"Fetched {len(season_stats_dataframe)} season stat rows from nba_api for {season_to_load}.")
-
-    # -------------------------
-    # STEP 6: LOOP THROUGH EACH STATS ROW
-    # -------------------------
-    for _, row in season_stats_dataframe.iterrows():
-        nba_player_id = row["PLAYER_ID"]
-
-        # If the NBA player id is not in our local players table, skip it.
-        # Protects from inserting orphaned season stats rows
-        if nba_player_id not in nba_player_id_to_db_player_id:
-            skipped_count += 1
-            continue
-
-        # Get the internal database player id
-        db_player_id = nba_player_id_to_db_player_id[nba_player_id]
-
-        # Insert the season stats row into our table.
-        # ON CONFLICT makes the script able to be reran
-        cursor.execute(
-            """
-            INSERT INTO player_season_stats (
-                player_id,
-                season,
-                games_played,
-                minutes_per_game,
-                points_per_game,
-                rebounds_per_game,
-                assists_per_game,
-                steals_per_game,
-                blocks_per_game,
-                field_goal_pct,
-                three_point_pct,
-                free_throw_pct
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (player_id, season)
-            DO UPDATE SET
-                games_played = EXCLUDED.games_played,
-                minutes_per_game = EXCLUDED.minutes_per_game,
-                points_per_game = EXCLUDED.points_per_game,
-                rebounds_per_game = EXCLUDED.rebounds_per_game,
-                assists_per_game = EXCLUDED.assists_per_game,
-                steals_per_game = EXCLUDED.steals_per_game,
-                blocks_per_game = EXCLUDED.blocks_per_game,
-                field_goal_pct = EXCLUDED.field_goal_pct,
-                three_point_pct = EXCLUDED.three_point_pct,
-                free_throw_pct = EXCLUDED.free_throw_pct
-            """,
-            (
-                db_player_id,
-                season_to_load,
-                row["GP"],       # Games Played
-                row["MIN"],      # Minutes Per Game
-                row["PTS"],      # Points Per Game
-                row["REB"],      # Rebounds Per Game
-                row["AST"],      # Assists Per Game
-                row["STL"],      # Steals Per Game
-                row["BLK"],      # Blocks Per Game
-                row["FG_PCT"],   # Field Goal Percentage
-                row["FG3_PCT"],  # Three Point Percentage
-                row["FT_PCT"],   # Free Throw Percentage
-            ),
-        )
-
-        # increment the inserted or updated counter
-        inserted_or_updated_count += 1
-
-    # -------------------------
-    # STEP 7: COMMIT CHANGES
-    # -------------------------
-
-    connection.commit()
-
-    print(f"Inserted or updated {inserted_or_updated_count} player season stat rows.")
-    print(f"Skipped {skipped_count} rows because no matching player was found in the local database.")
-
-except Exception as error:
-    # Roll back the current transaction if something fails
-    if connection is not None:
-        connection.rollback()
-
-    # Show the error so we know what went wrong
-    print(f"Season stats ETL script failed: {error}")
-    raise
-
-finally:
-    # Always close the cursor if it was created
-    if cursor is not None:
-        cursor.close()
-
-    # Always close the connection if it was created
-    if connection is not None:
-        connection.close()
+    load_player_season_stats(season_to_load, connection)
