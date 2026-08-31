@@ -64,12 +64,32 @@ def main():
             """
         )
 
-        # get loaded 
+        # get loaded -> fetchall returns a list of tuples
+        loaded_season_rows = cursor.fetchall()
 
-    # 3. Diff agaisnt your full season list -> missing_seasons
+        loaded_seasons = []
 
-    # 4. Loop missing_seasons, try/except calling load_player_season_stats(season, connection)
-    # passing the same connection opened in step 1
+        # pull the value out of the tuple before appending it.
+        for season, tuple_2 in loaded_season_rows:
+            loaded_seasons.append(season)
+
+        # 3. Diff agaisnt your full season list -> missing_seasons
+        # missing_seasons = [s for s in all_seasons if s not in loaded_seasons]
+        missing_seasons = [s for s in all_seasons if s not in loaded_seasons]
+
+        # 4. Loop missing_seasons, try/except calling load_player_season_stats(season, connection)
+        # passing the same connection opened in step 1
+        # try / except call load_player_season_stats
+        for missing_season in missing_seasons:
+            load_player_season_stats(missing_season, connection)
+
+    # need an except block
+    except Exception as error:
+        if connection is not None:
+            connection.rollback()
+
+        # Show the error so we know what went wrong
+        print(f"load player season stats failed: {error}")
 
     # 5.  Close the connection once after the loop
     finally:
