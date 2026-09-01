@@ -70,10 +70,11 @@ def main():
         loaded_seasons = []
 
         # pull the value out of the tuple before appending it.
-        for season, tuple_2 in loaded_season_rows:
+        for season, in loaded_season_rows:
             loaded_seasons.append(season)
 
         # 3. Diff agaisnt your full season list -> missing_seasons
+        # we need to get all seasons
         # missing_seasons = [s for s in all_seasons if s not in loaded_seasons]
         missing_seasons = [s for s in all_seasons if s not in loaded_seasons]
 
